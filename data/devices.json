@@ -1,0 +1,33 @@
+{
+	"DeviceIds":[
+        {
+          "key": "D12'TZFS'SLM1'MTRH3'PWR",
+          "doc_count": 8455
+        },
+        {
+          "key": "D12'TZFS'SLM1'MTRH3'TFL",
+          "doc_count": 8455
+        },
+        {
+          "key": "D12'TZFS'SLM1'MTRH3'TRT",
+          "doc_count": 8455
+        },
+        {
+          "key": "D12'TZFS'SLM1'MTRH4'CUMVLM",
+          "doc_count": 8455
+        },
+        {
+          "key": "D12'TZFS'SLM1'MTRH4'FL",
+          "doc_count": 8455
+        },
+        {
+          "key": "D12'TZFS'SLM1'MTRH4'PWR",
+          "doc_count": 8455
+        },
+        {
+          "key": "D12'TZFS'SLM1'MTRH4'TFL",
+          "doc_count": 8455
+        }
+        
+      ]
+}

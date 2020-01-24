@@ -1,0 +1,38 @@
+{
+  "name": "contract-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./server/main.js",
+  "dependencies": {
+    "@truffle/contract": "^4.1.4",
+    "babel-cli": "^6.26.0",
+    "babel-preset": "^1.1.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-0": "^6.24.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "ejs": "^3.0.1",
+    "env": "^0.0.2",
+    "ethereumjs-tx": "^2.1.2",
+    "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "moment": "^2.24.0",
+    "nodemon": "^2.0.2",
+    "openzeppelin-solidity": "^2.4.0",
+    "reload": "^3.0.4",
+    "web3": "^1.2.5-rc.0"
+  },
+  "devDependencies": {
+    "truffle-contract": "^4.0.31",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server/main.js",
+    "dev": "node_modules/.bin/webpack && node server/main.js",
+    "webpack": "node_modules/.bin/webpack --watch"
+  },
+  "author": "",
+  "license": "ISC"
+}
