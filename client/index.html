@@ -24,6 +24,21 @@
 
         </div>
 
+        <!-- <div id="ftc-produce">
+            <h2>Add Deposit for your contract</h2>
+        <div class="form-group">
+            Amount of deposit
+            <br>
+            <input type="text" id="depo-amount" name="address" value=e.g 20 Ether><br>
+            <div class=button-div>
+                <button class="btn-add" id="button4" type="button" data-id="4">Make Deposit</button>
+                <!-- <button class="btn-add" id="button" type="button" data-id="7">Add Engineer</button> -->
+
+            </div>
+        </div>
+
+        </div>
+
         <div id="ftc-produce">
             <h2>Add a Case</h2>
         <div class="form-group">
@@ -42,9 +57,12 @@
             List of devices ??
             <br>
             <input type="text" id="Device" name="address" value="DeviceId1, DeviceId2, ...." style="padding: 15px 25px;"><br>
+            Amount of deposit (will be deducted from Building Owner account, 20 Ether)
+            <br>
+            <input type="text" id="depo-amount" name="address" value=e.g 20 Ether><br>
             <!-- <form action="/action_page.php"> -->
-                <br>
-                <input type="file" id="myFile" name="filename"><br>
+                <!-- <br>
+                <input type="file" id="myFile" name="filename"><br> -->
                 <!-- <input type="submit"> -->
               <!-- </form> -->
               <!-- <br>
@@ -58,6 +76,39 @@
         </div>
 
         </div>
+
+        <div id="ftc-produce">
+            <h2>Compare measured data for your case or get the list of previous comparisons</h2>
+        <div class="form-group">
+            Case-Id
+            <br>
+            <input type="text" id="case-check" name="address" value="e.g. 1"><br>
+            <div class=button-div>
+                <button class="btn-add" id="button3" type="button" data-id="5">Compare</button>
+                <button class="btn-add" id="button4" type="button" data-id="4">List of previous comparisons</button>
+
+            </div>
+        </div>
+    </div>
+
+    <ul id="myList">
+        <li><strong>List of comparisons:</strong></li>
+      </ul>
+
+      <div id="ftc-produce">
+            <h2>Make transaction</h2>
+        <div class="form-group">
+            Case-Id
+            <br>
+            <input type="text" id="case-check2" name="address" value="e.g. 1"><br>
+            The last day of comparison
+            <br>
+            <input type="text" id="date" name="address" value="e.g. 2012.08.10"><br>
+            <div class=button-div>
+                <button class="btn-add" id="button5" type="button" data-id="3">Execuet</button>
+            </div>
+        </div>
+    </div>
 
     </body>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>

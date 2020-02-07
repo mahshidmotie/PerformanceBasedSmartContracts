@@ -53,6 +53,8 @@ App = {
         console.log("array32:", ar32);
         App.devices= ar32;
 
+        //App.casecheck = $("#case-check").val();
+
 
         //console.log(App.devices);
         // fs.writeFile(App.buildingId + ".json", App.devices, 'utf8', function (err) {
@@ -127,6 +129,9 @@ App = {
 
             $('#button1').click(App.handleButtonClick);
             $('#button2').click(App.adduser);
+            $('#button3').click(App.comparedata);
+            $('#button4').click(App.getCompList);
+            $('#button5').click(App.makeTx);
             //$('#buttonMessage').click(App.loadMessage);
 
     },
@@ -149,6 +154,7 @@ App = {
             let bs = await App.AddRole.getarray(select);
             const buildingId = item[3];
             console.log("buildingId:",buildingId);
+            console.log("structs:",item);
             //const devlength = item[4].length;
             console.log("devices:",bs);
             var randomnumber2=(Math.random())*bs.length;
@@ -158,8 +164,60 @@ App = {
             console.log("devid:",devid);
             var devidstr = web3.utils.toAscii(devid);
             console.log("devidstr:",devidstr);
+            App.readmeasured(select, select2);
         }
     },
+
+    readmeasured: function (select, select2) {
+        var selstr = select.toString();
+        var sel2str = (select2+1).toString();
+        var base = "measured";
+        var measadd = base.concat(selstr.concat(sel2str));
+        console.log(measadd);
+        //var jsf = $.getJSON(`./data/${measadd}.json`);
+        //var jsf = $.getJSON(`./data/measured11.json`);
+        //var jsf2 = JSON.parse(jsf);
+        // var jsf2 = jsf.responseJSON();
+        // console.log(jsf2);
+        $.getJSON(`./data/${measadd}.json`, function(json) {
+            var jsf = json;
+            console.log(jsf); // this will show the info it in firebug console
+            var jsf2 = Math.floor(parseFloat (jsf["data"][0]["attributes"]["value"]));
+            console.log("temp:" , jsf2);
+            App.addval(select, jsf2);
+
+
+        });
+        //console.log(jsf);
+
+
+
+    },
+
+    addval: async function (select, jsf2) {
+
+        App.getMetaskAccountID();
+        App.val = jsf2;
+
+
+        App.contracts.AddRole.deployed().then(function(instance) {
+            return instance.addValue(
+                select,
+
+                App.val,
+                {from: App.metamaskAccountID}
+            );
+        }).then(function(result) {
+            // $("#ftc-item").text(result[tx]);
+            console.log('tempadd',result);
+        }).catch(function(err) {
+            console.log(err.message);
+        });
+
+
+    },
+
+
 
 
 
@@ -182,13 +240,13 @@ App = {
                 return await App.fillItem(event);
                 break;
             case 3:
-                return await App.checkObject(event);
+                return await App.makeTx(event);
                 break;
             case 4:
-                return await App.executeLogic(event);
+                return await App.getCompList(event);
                 break;
             case 5:
-                return await App.fetchItem(event);
+                return await App.comparedata(event);
                 break;
             case 6:
                 return await App.addCase(event);
@@ -315,8 +373,116 @@ App = {
     //         console.log(err.message);
     //     });
     // },
+    getCompList: async function (event) {
+        //App.getMetaskAccountID();
+        console.log("list khast");
+        App.casecheck = parseInt($("#case-check").val());
+        event.preventDefault();
+        //var processId = parseInt($(event.target).data('id'));
+        console.log(
+            "case-id", App.casecheck,
+        );
+        const CC = (await App.AddRole.compareCount()).toNumber(10);
+        const diffcount = (await App.AddRole.diffCount()).toNumber(10);
+        for (i=1; i<(diffcount+1); i++)
+        {
+            const diffadded = await App.AddRole.diffs(i);
+            const diff = diffadded[1].toNumber(10);
+            const CId = diffadded[2].toNumber(10);
+            const time = diffadded[3].toNumber(10);
+            dateObj = new Date(time * 1000);
+            utcString = dateObj.toUTCString();
+            if (CId == App.casecheck)
+            {
+                var node = document.createElement("li");
+                var textnode = document.createTextNode("CaseId:" + CId + "  start time:"+ utcString + "  Tem.Diff:" + diff);
+                node.appendChild(textnode);
+                document.getElementById("myList").appendChild(node);
+            }
 
-    addCase: function (event) {
+        }
+
+    },
+
+    makeTx: async function (event) {
+        //App.getMetaskAccountID();
+        console.log("Tx khast");
+        App.casecheck2 = parseInt($("#case-check2").val());
+        var date = new Date($("#date").val());
+        App.unixTimeStamp = (Math.floor(date.getTime() / 1000));
+        //App.unixTimeStamp = Date.parse($("#date").val());
+        event.preventDefault();
+        //var processId = parseInt($(event.target).data('id'));
+        console.log(
+            "Tx case-id:", App.casecheck2,
+            "due time:", App.unixTimeStamp
+        );
+
+        await App.contracts.AddRole.deployed().then(function(instance) {
+            return instance.makeTx(
+                App.casecheck2,
+                App.unixTimeStamp,
+                {from: App.metamaskAccountID}
+            );
+        }).then(function(result) {
+            // $("#ftc-item").text(result[tx]);
+            console.log('execute tx',result);
+        }).catch(function(err) {
+            console.log(err.message);
+        });
+        const CC = (await App.AddRole.amount()).toNumber(10);
+        console.log("amount", CC);
+        const CC2 = (await App.AddRole._to());
+        console.log("to address", CC2);
+    },
+
+    comparedata: async function (event) {
+        //App.getMetaskAccountID();
+        console.log("compare khast");
+        App.casecheck = parseInt($("#case-check").val());
+        event.preventDefault();
+        //var processId = parseInt($(event.target).data('id'));
+        console.log(
+            "case-id", App.casecheck,
+        );
+
+        // let bs = await App.AddRole.checkstruct(App.casecheck);
+        // console.log(bs);
+        await App.contracts.AddRole.deployed().then(function(instance) {
+            return instance.checkstruct(
+                App.casecheck,
+                {from: App.metamaskAccountID}
+            );
+        }).then(function(result) {
+            // $("#ftc-item").text(result[tx]);
+            console.log('casecheck',result);
+        }).catch(function(err) {
+            console.log(err.message);
+        });
+        const diffcount = await App.AddRole.diffCount();
+        const diffadded = await App.AddRole.diffs(diffcount);
+        const diff = diffadded[1].toString(10);
+        console.log("diff",diff);
+        const size0 = (await App.AddRole.size0()).toString(10);
+        console.log("size0", size0);
+        const CC = (await App.AddRole.compareCount()).toNumber(10);
+        console.log("compare count", CC);
+        const measi = await App.AddRole.asks(CC);
+        const measi2 = measi[3].toString(10);
+        console.log("measi", measi2);
+
+
+        const time = ((await App.AddRole.asks(CC))[2]).toNumber(10);
+        dateObj = new Date(time * 1000);
+        utcString = dateObj.toUTCString();
+
+        var node = document.createElement("li");
+        var textnode = document.createTextNode("CaseId:" + App.casecheck + "  start time:"+ utcString + "    Temp.Diff:" + diff);
+        node.appendChild(textnode);
+        document.getElementById("myList").appendChild(node);
+    },
+
+    addCase: async function (event) {
         event.preventDefault();
         //var processId = parseInt($(event.target).data('id'));
         console.log(
@@ -339,6 +505,24 @@ App = {
         }).catch(function(err) {
             console.log(err.message);
         });
+
+        const amount = parseInt($("#depo-amount").val());
+        App.depoAmount = amount * 1000000000000000000;
+        console.log('amount',App.depoAmount);
+        console.log('MetaID',App.metamaskAccountID);
+        App.contracts.AddRole.deployed().then(function(instance) {
+            return instance.addDepo(
+                {from : App.OwnerAdd,
+                value : App.depoAmount}
+            );
+        }).then(function(result) {
+            // $("#ftc-item").text(result[tx]);
+            console.log('addDepo',result);
+        }).catch(function(err) {
+            console.log(err.message);
+        });
+
+
 
 
     },
@@ -372,6 +556,30 @@ App = {
 
 
     },
+    // addDepo: async function(event) {
+    //     event.preventDefault();
+    //     App.getMetaskAccountID();
+    //     const amount = parseInt($("#depo-amount").val());
+    //     App.depoAmount = amount * 1000000000000000000;
+    //     console.log('amount',App.depoAmount);
+    //     console.log('MetaID',App.metamaskAccountID);
+    //     await App.contracts.AddRole.deployed().then(function(instance) {
+    //         return instance.addDepo(
+    //             {from : "0xC26aE747CB33B9F91E36eB1DF6fA11f615738C01",
+    //             value : App.depoAmount}
+    //         );
+    //     }).then(function(result) {
+    //         // $("#ftc-item").text(result[tx]);
+    //         console.log('addDepo',result);
+    //     }).catch(function(err) {
+    //         console.log(err.message);
+    //     });
+
+
+    // },
+
+
+
 
     // addEngineer: function (event) {
     //     event.preventDefault();

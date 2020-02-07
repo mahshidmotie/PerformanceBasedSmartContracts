@@ -1,0 +1,28 @@
+{
+  "links": {
+    "self": "https://api.buildingtwin.siemens.com/core/buildings/4f377d4d-674e-421d-9c89-f43f692be293/observations?filter[measuredBy]=4427f560-663e-4bdd-bdea-886db4464c09",
+    "next": "https://api.buildingtwin.siemens.com/core/buildings/4f377d4d-674e-421d-9c89-f43f692be293/observations?filter[measuredBy]=4427f560-663e-4bdd-bdea-886db4464c09&page[cursor]=eyJnIjp7ImwiOjEwMCwibyI6MH0sImUiOnsibCI6MTAwLCJvIjoxMDB9fQ=="
+  },
+  "data": [
+    {
+      "type": "observation",
+      "id": "49599855383049303232701882123387942466675367457148895234.0",
+      "attributes": {
+        "value": "14.400",
+        "timestamp": "2020-01-02T00:11:55+00:00"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/4f377d4d-674e-421d-9c89-f43f692be293/datapoints/4427f560-663e-4bdd-bdea-886db4464c09"
+          },
+          "data": {
+            "id": "4427f560-663e-4bdd-bdea-886db4464c09",
+            "type": "datapoint"
+          }
+        }
+      }
+    }
+  ]
+}
+	
