@@ -1,6 +1,44 @@
+require('dotenv').config();
 var Web3 = require('web3');
 var TruffleContract = require('@truffle/contract');
-var fs = require('fs')
+var fs = require('fs');
+//var Gettoken = require('../server/main');
+//var cors = require('cors');
+var request = require('request');
+function getUrlParameter(name) {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    console.log(results);
+  };
+async function gettoken() {
+return getUrlParameter("token");
+        // console.log(process.env.TOKEN_ENDPOINT);
+        // let payload = {
+        //     "client_id": process.env.CLIENT_ID,
+        //     "client_secret": process.env.CLIENT_SECRET,
+        //     "audience": process.env.TOKEN_AUDIENCE,
+        //     "grant_type": "client_credentials"
+        // };
+
+        // request.post({
+        //     headers: { 'content-type': 'application/json' },
+        //     url: process.env.TOKEN_ENDPOINT,
+        //     body: JSON.stringify(payload)
+        // }, function (err, response, body) {
+        //     if (err) {
+        //         console.error(err);
+        //         process.exit(1);
+        //     }
+
+        //     let res = JSON.parse(body);
+        //     res.setHeader('Access-Control-Allow-Origin', '*');
+        //     console.log(res.access_token);
+            //return res.access_token;
+       // });
+    };
+
 App = {
     //Initialize variables (TODO: needed?)
 
@@ -35,8 +73,8 @@ App = {
         var a= $("#Device").val();
         var Device = JSON.parse( a) ;
         var length = Object.keys(Device.DeviceIds).length;
-        console.log(Device.DeviceIds);
-        console.log("length:",  Object.keys(Device.DeviceIds).length);
+        //console.log(Device.DeviceIds);
+        //console.log("length:",  Object.keys(Device.DeviceIds).length);
         var ar = new Array;
         var ar32 = new Array;
         for (i=0; i<length; i++)
@@ -50,7 +88,7 @@ App = {
             ar32[i]= web3.utils.asciiToHex(Device.DeviceIds[i].key);
 
         }
-        console.log("array32:", ar32);
+        //console.log("array32:", ar32);
         App.devices= ar32;
 
         //App.casecheck = $("#case-check").val();
@@ -144,36 +182,37 @@ App = {
     },
 
     decide: async function (randomnumber) {
+        //var token =await gettoken();
+        //console.log(token);
         const caseCount = await App.AddRole.caseCount();
-        console.log(' ' + randomnumber);
         if (randomnumber<caseCount*1200/(2*60*24)){
-            console.log("select1:");
+            //console.log("select1:");
             const select = Math.floor(randomnumber*(2*60*24)/1200)+1;
             console.log(select);
             const item = await App.AddRole.cases(select);
             let bs = await App.AddRole.getarray(select);
             const buildingId = item[3];
             console.log("buildingId:",buildingId);
-            console.log("structs:",item);
+            //console.log("structs:",item);
             //const devlength = item[4].length;
-            console.log("devices:",bs);
+            //console.log("devices:",bs);
             var randomnumber2=(Math.random())*bs.length;
             const select2 = Math.floor(randomnumber2);
-            console.log("select2",select2);
+            //console.log("select2",select2);
             var devid = bs[select2];
-            console.log("devid:",devid);
+            //console.log("devid:",devid);
             var devidstr = web3.utils.toAscii(devid);
-            console.log("devidstr:",devidstr);
+            console.log("device id:",devidstr);
             App.readmeasured(select, select2);
         }
     },
 
-    readmeasured: function (select, select2) {
+    readmeasured: async function (select, select2) {
         var selstr = select.toString();
         var sel2str = (select2+1).toString();
         var base = "measured";
         var measadd = base.concat(selstr.concat(sel2str));
-        console.log(measadd);
+        //console.log(measadd);
         //var jsf = $.getJSON(`./data/${measadd}.json`);
         //var jsf = $.getJSON(`./data/measured11.json`);
         //var jsf2 = JSON.parse(jsf);
@@ -183,12 +222,14 @@ App = {
             var jsf = json;
             console.log(jsf); // this will show the info it in firebug console
             var jsf2 = Math.floor(parseFloat (jsf["data"][0]["attributes"]["value"]));
-            console.log("temp:" , jsf2);
+            console.log("Measured Temperature:" , jsf2);
             App.addval(select, jsf2);
 
 
         });
         //console.log(jsf);
+
+        //console.log(token);
 
 
 
@@ -209,7 +250,7 @@ App = {
             );
         }).then(function(result) {
             // $("#ftc-item").text(result[tx]);
-            console.log('tempadd',result);
+            console.log('Temperature added',result);
         }).catch(function(err) {
             console.log(err.message);
         });
@@ -222,7 +263,7 @@ App = {
 
 
     handleButtonClick: async function(event) {
-        console.log("click kard2");
+        //console.log("click kard2");
         event.preventDefault();
 
         App.getMetaskAccountID();
@@ -230,7 +271,7 @@ App = {
         App.readForm();
 
         var processId = parseInt($(event.target).data('id'));
-        console.log('processId',processId);
+        //console.log('processId',processId);
 
         switch(processId) {
             case 1:
@@ -375,12 +416,12 @@ App = {
     // },
     getCompList: async function (event) {
         //App.getMetaskAccountID();
-        console.log("list khast");
+        //console.log("list khast");
         App.casecheck = parseInt($("#case-check").val());
         event.preventDefault();
         //var processId = parseInt($(event.target).data('id'));
         console.log(
-            "case-id", App.casecheck,
+            "case-id:", App.casecheck,
         );
         const CC = (await App.AddRole.compareCount()).toNumber(10);
         const diffcount = (await App.AddRole.diffCount()).toNumber(10);
@@ -406,7 +447,7 @@ App = {
 
     makeTx: async function (event) {
         //App.getMetaskAccountID();
-        console.log("Tx khast");
+        //console.log("Tx khast");
         App.casecheck2 = parseInt($("#case-check2").val());
         var date = new Date($("#date").val());
         App.unixTimeStamp = (Math.floor(date.getTime() / 1000));
@@ -430,20 +471,22 @@ App = {
         }).catch(function(err) {
             console.log(err.message);
         });
-        const CC = (await App.AddRole.amount()).toNumber(10);
-        console.log("amount", CC);
+        const CC = (await App.AddRole.amount()).toString(10);
+        console.log("amount:", CC);
         const CC2 = (await App.AddRole._to());
-        console.log("to address", CC2);
+        console.log("to address:", CC2);
+        const xtime = (await App.AddRole.amount()).toString(10);
+        console.log("amount paid:", xtime);
     },
 
     comparedata: async function (event) {
         //App.getMetaskAccountID();
-        console.log("compare khast");
+        //console.log("compare khast");
         App.casecheck = parseInt($("#case-check").val());
         event.preventDefault();
         //var processId = parseInt($(event.target).data('id'));
         console.log(
-            "case-id", App.casecheck,
+            "case-id:", App.casecheck,
         );
 
         // let bs = await App.AddRole.checkstruct(App.casecheck);
@@ -455,21 +498,21 @@ App = {
             );
         }).then(function(result) {
             // $("#ftc-item").text(result[tx]);
-            console.log('casecheck',result);
+            console.log('casecheck:',result);
         }).catch(function(err) {
             console.log(err.message);
         });
         const diffcount = await App.AddRole.diffCount();
         const diffadded = await App.AddRole.diffs(diffcount);
         const diff = diffadded[1].toString(10);
-        console.log("diff",diff);
+        //console.log("diff",diff);
         const size0 = (await App.AddRole.size0()).toString(10);
-        console.log("size0", size0);
+        //console.log("size0", size0);
         const CC = (await App.AddRole.compareCount()).toNumber(10);
-        console.log("compare count", CC);
+        //console.log("compare count", CC);
         const measi = await App.AddRole.asks(CC);
         const measi2 = measi[3].toString(10);
-        console.log("measi", measi2);
+        //console.log("measi", measi2);
 
 
         const time = ((await App.AddRole.asks(CC))[2]).toNumber(10);
@@ -490,45 +533,56 @@ App = {
             "Contractor address:", App.ContAdd,
 
         );
-
+           App.amount = parseInt($("#depo-amount").val());
+           App.depoAmount = App.amount * 1000000000000000000;
         App.contracts.AddRole.deployed().then(function(instance) {
             return instance.addCase(
                 App.OwnerAdd,
                 App.ContAdd,
                 App.buildingId,
                 App.devices,
+                App.amount,
                 {from: App.metamaskAccountID}
             );
         }).then(function(result) {
             // $("#ftc-item").text(result[tx]);
-            console.log('addOwner',result);
+            console.log('addOwner:',result);
+            console.log('amount',App.depoAmount);
+            //console.log('MetaID',App.metamaskAccountID);
+            App.contracts.AddRole.deployed().then(function(instance) {
+                return instance.addDepo(
+                    {from : App.OwnerAdd,
+                    value : App.depoAmount}
+                );
+            }).then(function(result) {
+                // $("#ftc-item").text(result[tx]);
+                console.log('addDepo:',result);
+            }).catch(function(err) {
+                console.log(err.message);
+            });
         }).catch(function(err) {
             console.log(err.message);
         });
 
-        const amount = parseInt($("#depo-amount").val());
-        App.depoAmount = amount * 1000000000000000000;
-        console.log('amount',App.depoAmount);
-        console.log('MetaID',App.metamaskAccountID);
-        App.contracts.AddRole.deployed().then(function(instance) {
-            return instance.addDepo(
-                {from : App.OwnerAdd,
-                value : App.depoAmount}
-            );
-        }).then(function(result) {
-            // $("#ftc-item").text(result[tx]);
-            console.log('addDepo',result);
-        }).catch(function(err) {
-            console.log(err.message);
-        });
-
-
+            // console.log('amount',App.depoAmount);
+            // //console.log('MetaID',App.metamaskAccountID);
+            // App.contracts.AddRole.deployed().then(function(instance) {
+            //     return instance.addDepo(
+            //         {from : App.OwnerAdd,
+            //         value : App.depoAmount}
+            //     );
+            // }).then(function(result) {
+            //     // $("#ftc-item").text(result[tx]);
+            //     console.log('addDepo:',result);
+            // }).catch(function(err) {
+            //     console.log(err.message);
+            // });
 
 
     },
 
     adduser: function (event) {
-        console.log("click kard1");
+        //console.log("click kard1");
         event.preventDefault();
 
         App.getMetaskAccountID();
@@ -549,7 +603,7 @@ App = {
             );
         }).then(function(result) {
             // $("#ftc-item").text(result[tx]);
-            console.log('addUser',result);
+            console.log('addUser:',result);
         }).catch(function(err) {
             console.log(err.message);
         });

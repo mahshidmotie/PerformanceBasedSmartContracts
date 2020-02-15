@@ -1,7 +1,11 @@
 require('dotenv').config();
 const express = require('express');
 const app = express();
+//console.log(process.env.TOKEN_ENDPOINT);
 const PORT = process.env.PORT || 3000;
+var cors = require('cors');
+var request = require('request');
+
 const http = require('http');
 const data11 = require('../data/measured11.json');
 const data12 = require('../data/measured12.json');
@@ -17,9 +21,16 @@ const data24 = require('../data/measured24.json');
 const data25 = require('../data/measured25.json');
 const data26 = require('../data/measured26.json');
 const data27 = require('../data/measured27.json');
-
+app.use(cors({
+    'allowedHeaders': ['sessionId', 'Content-Type'],
+    'exposedHeaders': ['sessionId'],
+    'origin': '*',
+    'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    'preflightContinue': false
+  })); // Use this after the variable declaration
 app.use(express.static('client'));
 app.use(express.static('build/contracts'));
+app.options('*', cors());
 app.get('/', (req, res) => {
     res.sendFile(`${__dirname}/client/index.html`);
   });
@@ -105,6 +116,9 @@ app.get('/data/measured27.json',(req, res)=>
 res.json(data27)
 );
 
+app.get('/token',(req, res)=>{
+    res.json(gettoken())
+});
 
 const server = http.createServer(app);
 server.listen(PORT, () => {
@@ -113,3 +127,33 @@ server.listen(PORT, () => {
 }
 
 );
+async function gettoken() {
+    console.log(process.env.TOKEN_ENDPOINT);
+    let payload = {
+        "client_id": process.env.CLIENT_ID,
+        "client_secret": process.env.CLIENT_SECRET,
+        "audience": process.env.TOKEN_AUDIENCE,
+        "grant_type": "client_credentials"
+    };
+
+    request.post({
+        headers: { 'content-type': 'application/json' },
+        url: process.env.TOKEN_ENDPOINT,
+        body: JSON.stringify(payload)
+    }, function (err, response, body) {
+        if (err) {
+            console.error(err);
+            process.exit(1);
+        }
+
+        let res = JSON.parse(body);
+        //console.log(res.access_token);
+        console.log(res);
+        return (res);
+    });
+};
+
+
+
+
+

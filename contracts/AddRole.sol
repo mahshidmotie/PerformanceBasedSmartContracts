@@ -33,6 +33,7 @@ contract AddRole {
   uint public diff = 0;
   uint public  size0 = 0;
   uint public amount = 0;
+  uint public xtime = 0;
   address payable public _to;
   mapping (address => uint) private balances;
   //address payable ContractAdd = payable address(this);
@@ -112,8 +113,9 @@ contract AddRole {
   //       return a;
   //   }
 
-  function addCase(address account1, address payable account2, string memory BI, bytes32[] memory DeIDs) public {
+  function addCase(address account1, address payable account2, string memory BI, bytes32[] memory DeIDs, uint depoam) public {
     require (isWhitelisted(account1),"building owner is not a user");
+    require (depoam == 80,"not enoug depo");
     caseCount ++;
     uint time = block.timestamp;
     cases[caseCount] = CaseItem(caseCount, account1, account2, BI, DeIDs, time);
@@ -121,7 +123,7 @@ contract AddRole {
   }
 
   function addDepo() public payable {
-    require (msg.value == 20 ether,"not enoug depo");
+    require (msg.value == 80 ether,"not enoug depo");
     //ContractAdd.transfer(msg.value);
     //Receive(msg.value);
   }
@@ -183,7 +185,7 @@ function checkstruct (uint _caseid) public returns (uint differences){
   }
 
   function makeTx (uint  caseNo, uint  duedate) public {
-    uint xtime = cases[caseNo].time;
+    xtime = cases[caseNo].time;
 
     for (uint i=1; i<(TxCount+1); i++)
     {
@@ -202,9 +204,9 @@ function checkstruct (uint _caseid) public returns (uint differences){
       }
     }
     uint totdiff = 0;
-    //uint totamount = 20;
-    //uint public maxamount = 20*(duedate-xtime)/63072000*1000000000000000000;
-    //uint public maxdiff = 200*(duedate-xtime)/63072000;
+    //uint totamount = 80;
+    uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
+
     for (uint i=1; i<(diffCount+1); i++)
     {
       if ( diffs[uint(i)].caseid == caseNo && diffs[uint(i)].time > (xtime-1) && diffs[uint(i)].time < (duedate+1))
@@ -213,7 +215,8 @@ function checkstruct (uint _caseid) public returns (uint differences){
       }
     }
 
-    amount =1000000000000000000*totdiff;
+    amount = maxamount-(totdiff*1000000000000000000/2);
+    //amount = 2*1000000000000000000;
 
 
     TxCount ++;
