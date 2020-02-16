@@ -185,6 +185,8 @@ function checkstruct (uint _caseid) public returns (uint differences){
   }
 
   function makeTx (uint  caseNo, uint  duedate) public {
+
+
     xtime = cases[caseNo].time;
 
     for (uint i=1; i<(TxCount+1); i++)
@@ -195,7 +197,7 @@ function checkstruct (uint _caseid) public returns (uint differences){
       }
     }
 
-
+require((duedate-xtime)>60, "You should wait at least one minute after your previous transaction");
     for (uint i=1; i<(caseCount+1); i++)
     {
       if ( cases[uint(i)].CaseNumber == caseNo)
@@ -205,7 +207,8 @@ function checkstruct (uint _caseid) public returns (uint differences){
     }
     uint totdiff = 0;
     //uint totamount = 80;
-    uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
+    //uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
+    uint maxamount = (80*(duedate-xtime)/3600)*1000000000000000000;
 
     for (uint i=1; i<(diffCount+1); i++)
     {
@@ -215,7 +218,7 @@ function checkstruct (uint _caseid) public returns (uint differences){
       }
     }
 
-    amount = maxamount-(totdiff*1000000000000000000/2);
+    amount = maxamount-(totdiff*1000000000000000000/8);
     //amount = 2*1000000000000000000;
 
 
