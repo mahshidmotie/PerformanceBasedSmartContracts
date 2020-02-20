@@ -2,41 +2,103 @@ require('dotenv').config();
 var Web3 = require('web3');
 var TruffleContract = require('@truffle/contract');
 var fs = require('fs');
+const http = require('http');
+const https = require('https');
 //var Gettoken = require('../server/main');
 //var cors = require('cors');
 var request = require('request');
-function getUrlParameter(name) {
-    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
-    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    var results = regex.exec(location.search);
-    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
-    console.log(results);
-  };
-async function gettoken() {
-return getUrlParameter("token");
-        // console.log(process.env.TOKEN_ENDPOINT);
-        // let payload = {
-        //     "client_id": process.env.CLIENT_ID,
-        //     "client_secret": process.env.CLIENT_SECRET,
-        //     "audience": process.env.TOKEN_AUDIENCE,
-        //     "grant_type": "client_credentials"
-        // };
+// function getUrlParameter(name) {
+//     name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+//     var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+//     var results = regex.exec(location.search);
+//     return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+//     console.log(results);
+//   };
 
-        // request.post({
-        //     headers: { 'content-type': 'application/json' },
-        //     url: process.env.TOKEN_ENDPOINT,
-        //     body: JSON.stringify(payload)
-        // }, function (err, response, body) {
-        //     if (err) {
-        //         console.error(err);
-        //         process.exit(1);
-        //     }
 
-        //     let res = JSON.parse(body);
-        //     res.setHeader('Access-Control-Allow-Origin', '*');
-        //     console.log(res.access_token);
-            //return res.access_token;
-       // });
+    function httpRequest(method, url, body = null) {
+        if (!['get', 'post', 'head'].includes(method)) {
+            throw new Error(`Invalid method: ${method}`);
+        }
+
+        let urlObject;
+
+        try {
+            urlObject = new URL(url);
+        } catch (error) {
+            throw new Error(`Invalid url ${url}`);
+        }
+
+        if (body && method !== 'post') {
+            throw new Error(`Invalid use of the body parameter while using the ${method.toUpperCase()} method.`);
+        }
+
+        let options = {
+            method: method.toUpperCase(),
+            hostname: urlObject.hostname,
+            port: urlObject.port,
+            path: urlObject.pathname,
+            headers : {"Content-Type": "application/json"}
+        };
+
+        if (body) {
+            options.headers['Content-Length'] = Buffer.byteLength(body);
+        }
+
+        return new Promise((resolve, reject) => {
+
+            const clientRequest = http.request(options, incomingMessage => {
+
+                // Response object.
+                let response = {
+                    statusCode: incomingMessage.statusCode,
+                    headers: incomingMessage.headers,
+                    body: []
+                };
+
+                // Collect response body data.
+                incomingMessage.on('data', chunk => {
+                    response.body.push(chunk);
+                });
+
+                // Resolve on end.
+                incomingMessage.on('end', () => {
+                    if (response.body.length) {
+
+                        response.body = response.body.join();
+
+                        try {
+                            response.body = JSON.parse(response.body);
+                        } catch (error) {
+                            // Silently fail if response is not JSON.
+                        }
+                    }
+
+                    resolve(response);
+                });
+            });
+
+            // Reject on request error.
+            clientRequest.on('error', error => {
+                reject(error);
+            });
+
+            // Write request body if present.
+            if (body) {
+                clientRequest.write(body);
+            }
+
+            // Close HTTP connection.
+            clientRequest.end();
+        });
+    };
+    async function passid () {
+
+        let iddata = {
+            "device_id": "mahshid"
+        };
+
+        return await httpRequest("post", 'http://localhost:3000/id', JSON.stringify(iddata))
     };
 
 App = {
@@ -46,6 +108,9 @@ App = {
     contracts: {},
     currentAccount:{},
     init: async function () {
+
+
+
         //App.readForm();
         /// Setup access to blockchain
         return await App.initWeb3();
@@ -124,6 +189,7 @@ App = {
     },
 
 
+
     initContractAddRole : async function (){
 
         await $.getJSON('AddRole.json',function(data){
@@ -136,6 +202,31 @@ App = {
         });
         App.fetchEvents();
         App.AddRole = await App.contracts.AddRole.deployed();
+
+        console.log("GET DATA")
+
+        // $.post({
+        //     headers: { 'content-type': 'application/json' },
+        //     url: 'http://localhost:3000/id',
+        //     body: JSON.stringify({
+        //         "device_id": "mahshid"
+        //     })
+        // }, function (err, response, body) {
+        //     if (err) {
+        //         console.error(err);
+        //         process.exit(1);
+        //     }
+
+        // });
+        passid();
+        // $.getJSON(`http://localhost:3000/measurement`, function(json) {
+        //     var jsf = json;
+        //     console.log("COOL DATA",jsf);
+
+        // });
+
+
+
         setInterval(() => {
             App.randcreat()
         }, 30000);

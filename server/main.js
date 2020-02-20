@@ -1,12 +1,19 @@
 require('dotenv').config();
 const express = require('express');
+const httputil = require("./httputil");
 const app = express();
 //console.log(process.env.TOKEN_ENDPOINT);
 const PORT = process.env.PORT || 3000;
 var cors = require('cors');
 var request = require('request');
+var bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
+const assert = require("assert");
+let cachedToken = null;
+const BASE_PATH = "https://api.buildingtwin.siemens.com/core/buildings";
 
 const http = require('http');
+const https = require('https');
 const data11 = require('../data/measured11.json');
 const data12 = require('../data/measured12.json');
 const data13 = require('../data/measured13.json');
@@ -21,16 +28,18 @@ const data24 = require('../data/measured24.json');
 const data25 = require('../data/measured25.json');
 const data26 = require('../data/measured26.json');
 const data27 = require('../data/measured27.json');
-app.use(cors({
-    'allowedHeaders': ['sessionId', 'Content-Type'],
-    'exposedHeaders': ['sessionId'],
-    'origin': '*',
-    'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    'preflightContinue': false
-  })); // Use this after the variable declaration
+// app.use(cors({
+//     'allowedHeaders': ['sessionId', 'Content-Type'],
+//     'exposedHeaders': ['sessionId'],
+//     'origin': '*',
+//     'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
+//     'preflightContinue': false
+//   })); // Use this after the variable declaration
 app.use(express.static('client'));
 app.use(express.static('build/contracts'));
-app.options('*', cors());
+//app.use(express.bodyParser());
+var jsonParser = bodyParser.json();
+//app.options('*', cors());
 app.get('/', (req, res) => {
     res.sendFile(`${__dirname}/client/index.html`);
   });
@@ -120,6 +129,26 @@ app.get('/token',(req, res)=>{
     res.json(gettoken())
 });
 
+app.post('/id', jsonParser, async (req, res)=>{
+   var deid= req.body.device_id;
+   console.log(`${deid}`);
+   //res.send(deid);
+   var token = await gettoken();
+   console.log(token);
+   var callres = await getObservationsByDatapointId(token, "f3d22a6c-8250-41e4-8e44-39a4ab5cb255", "66b080a1-a963-4c0f-8680-3705c633e88c");
+   assert.equal(callres.status, 200);
+   body = callres.data;
+    assert.equal(body.data.length, 1);
+
+    assert.equal(body.data[0].type, "observation");
+    console.log("value:",body.data[0].attributes.value);
+});
+
+app.get('/measurement',async (req, res)=>{
+    //res.json((await gettoken()).access_token)
+    res.json(await gettoken())
+});
+
 const server = http.createServer(app);
 server.listen(PORT, () => {
     console.log(`your server is running on port ${PORT}`);
@@ -127,8 +156,103 @@ server.listen(PORT, () => {
 }
 
 );
+
+
+function httpRequest(method, url, body = null) {
+    if (!['get', 'post', 'head'].includes(method)) {
+        throw new Error(`Invalid method: ${method}`);
+    }
+
+    let urlObject;
+
+    try {
+        urlObject = new URL(url);
+    } catch (error) {
+        throw new Error(`Invalid url ${url}`);
+    }
+
+    if (body && method !== 'post') {
+        throw new Error(`Invalid use of the body parameter while using the ${method.toUpperCase()} method.`);
+    }
+
+    let options = {
+        method: method.toUpperCase(),
+        hostname: urlObject.hostname,
+        port: urlObject.port,
+        path: urlObject.pathname,
+        headers : {"Content-Type": "application/json"}
+    };
+
+    if (body) {
+        options.headers['Content-Length'] = Buffer.byteLength(body);
+    }
+
+    return new Promise((resolve, reject) => {
+
+        const clientRequest = https.request(options, incomingMessage => {
+
+            // Response object.
+            let response = {
+                statusCode: incomingMessage.statusCode,
+                headers: incomingMessage.headers,
+                body: []
+            };
+
+            // Collect response body data.
+            incomingMessage.on('data', chunk => {
+                response.body.push(chunk);
+            });
+
+            // Resolve on end.
+            incomingMessage.on('end', () => {
+                if (response.body.length) {
+
+                    response.body = response.body.join();
+
+                    try {
+                        response.body = JSON.parse(response.body);
+                    } catch (error) {
+                        // Silently fail if response is not JSON.
+                    }
+                }
+
+                resolve(response);
+            });
+        });
+
+        // Reject on request error.
+        clientRequest.on('error', error => {
+            reject(error);
+        });
+
+        // Write request body if present.
+        if (body) {
+            clientRequest.write(body);
+        }
+
+        // Close HTTP connection.
+        clientRequest.end();
+    });
+};
+
+
 async function gettoken() {
-    console.log(process.env.TOKEN_ENDPOINT);
+
+    let now = Date.now()/1000;
+
+    if(cachedToken){
+        console.log("oomad too cash");
+      var decoded = jwt.decode(cachedToken);
+
+      if(decoded.exp > (now+30)){
+        console.log("same token");
+        return cachedToken
+      }else{
+        console.log("renew token");
+      }
+    }
+
+    //console.log(process.env.TOKEN_ENDPOINT);
     let payload = {
         "client_id": process.env.CLIENT_ID,
         "client_secret": process.env.CLIENT_SECRET,
@@ -136,22 +260,60 @@ async function gettoken() {
         "grant_type": "client_credentials"
     };
 
-    request.post({
-        headers: { 'content-type': 'application/json' },
-        url: process.env.TOKEN_ENDPOINT,
-        body: JSON.stringify(payload)
-    }, function (err, response, body) {
-        if (err) {
-            console.error(err);
-            process.exit(1);
-        }
 
-        let res = JSON.parse(body);
-        //console.log(res.access_token);
-        console.log(res);
-        return (res);
-    });
+    cachedToken = (await httpRequest("post", process.env.TOKEN_ENDPOINT, JSON.stringify(payload))).body.access_token;
+    //cachedToken = res.body.access_token;
+    return cachedToken
 };
+async function getdata() {
+    let payload = {
+        "client_id": process.env.CLIENT_ID,
+        "client_secret": process.env.CLIENT_SECRET,
+        "audience": process.env.TOKEN_AUDIENCE,
+        "grant_type": "client_credentials"
+    };
+
+
+    cachedToken = (await httpRequest("post", process.env.TOKEN_ENDPOINT, JSON.stringify(payload))).body.access_token;
+    //cachedToken = res.body.access_token;
+    return cachedToken
+};
+
+function getRequest(token, method, path, data) {
+    return {
+      schema: "https",
+      host: process.env.API_DOMAIN,
+      path: path,
+      method: method,
+      data: data,
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      }
+    };
+  };
+  const REQUEST_TIMEOUT = 20000;
+  async function getByFilter(token, buildingId, resource, filterKey, filterValue) {
+    let filter = `?filter[${filterKey}]=${filterValue}`;
+    let path = `${getBasePath()}/${buildingId}/${resource}${filter}`;
+    let req = getGetRequest(token, path);
+    let res = await httputil.smartRequest(req, REQUEST_TIMEOUT);
+    //let res = await httpRequest("get", path, JSON.stringify(req));
+    return res;
+  };
+
+  function getGetRequest(token, path) {
+    return getRequest(token, "GET", path, null);
+  };
+
+  async function getObservationsByDatapointId(token, buildingId, id) {
+    return getByFilter(token, buildingId, "observations", "measuredBy", id);
+  };
+
+  function getBasePath() {
+    return process.env.BASE_PATH || BASE_PATH;
+  };
+
 
 
 

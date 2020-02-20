@@ -5,10 +5,13 @@
   "main": "./server/main.js",
   "dependencies": {
     "@truffle/contract": "^4.1.4",
+    "assert": "^2.0.0",
+    "axios": "^0.19.2",
     "babel-cli": "^6.26.0",
     "babel-preset": "^1.1.1",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-0": "^6.24.1",
+    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "ejs": "^3.0.1",
@@ -16,13 +19,16 @@
     "ethereumjs-tx": "^2.1.2",
     "express": "^4.17.1",
     "fs": "0.0.1-security",
+    "jsonwebtoken": "^8.5.1",
     "moment": "^2.24.0",
     "nodemon": "^2.0.2",
     "openzeppelin-solidity": "^2.4.0",
+    "proxy-agent": "^3.1.1",
     "reload": "^3.0.4",
     "web3": "^1.2.5-rc.0"
   },
   "devDependencies": {
+    "axios-logger": "^2.3.1",
     "truffle-contract": "^4.0.31",
     "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10"
