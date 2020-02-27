@@ -117,13 +117,26 @@ App = {
     },
 
     initWeb3 : async function (){
-        if (process.env.MODE == 'development' || typeof window.web3 === 'undefined'){
-            App.web3Provider = new Web3.providers.HttpProvider(process.env.LOCAL_NODE);
+
+       if (window.ethereum) {
+        App.web3Provider = window.ethereum;
+        try {
+            // Request account access
+            await window.ethereum.enable();
+        } catch (error) {
+            // User denied account access...
+            console.error("User denied account access")
         }
-        else{
-             App.web3Provider = web3.currentProvider;
-        }
-        web3 = new Web3(App.web3Provider);
+    }
+    // Legacy dapp browsers...
+    else if (window.web3) {
+        App.web3Provider = window.web3.currentProvider;
+    }
+    // If no injected web3 instance is detected, fall back to Ganache (ganache-cli: 7545, UI: 8545)
+    else {
+        App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+    }
+        console.log(web3);
 
         App.getMetaskAccountID();
 
@@ -137,20 +150,20 @@ App = {
         App.buildingId = $("#Building-Id").val();
         var a= $("#Device").val();
         var Device = JSON.parse( a) ;
-        var length = Object.keys(Device.DeviceIds).length;
-        //console.log(Device.DeviceIds);
-        //console.log("length:",  Object.keys(Device.DeviceIds).length);
+        var length = Object.keys(Device.data).length;
+        console.log(Device.data);
+        console.log("length:",  Object.keys(Device.data).length);
         var ar = new Array;
         var ar32 = new Array;
         for (i=0; i<length; i++)
         {
-            ar[i]= Device.DeviceIds[i].key;
+            ar[i]= Device.data[i].attributes.source.id;
 
         }
         console.log("array:", ar);
         for (i=0; i<length; i++)
         {
-            ar32[i]= web3.utils.asciiToHex(Device.DeviceIds[i].key);
+            ar32[i]= web3.utils.asciiToHex(Device.data[i].attributes.source.id);
 
         }
         //console.log("array32:", ar32);
@@ -173,8 +186,9 @@ App = {
     },
 
 
-    getMetaskAccountID: function () {
-        web3 = new Web3(App.web3Provider);
+    getMetaskAccountID: async function () {
+
+       web3 = new Web3(App.web3Provider);
 
         // Retrieving accounts
         web3.eth.getAccounts(function(err, res) {
@@ -186,6 +200,10 @@ App = {
             App.metamaskAccountID = res[0];
 
         })
+        // console.log(web3);
+        // const accounts = await web3.eth.getAccounts();
+        // App.metamaskAccountID = accounts[0];
+        // console.log('getMetaskID:',App.metamaskAccountID);
     },
 
 
@@ -203,7 +221,7 @@ App = {
         App.fetchEvents();
         App.AddRole = await App.contracts.AddRole.deployed();
 
-        console.log("GET DATA")
+
 
         // $.post({
         //     headers: { 'content-type': 'application/json' },
@@ -218,7 +236,7 @@ App = {
         //     }
 
         // });
-        passid();
+        //passid();
         // $.getJSON(`http://localhost:3000/measurement`, function(json) {
         //     var jsf = json;
         //     console.log("COOL DATA",jsf);
@@ -294,37 +312,48 @@ App = {
             //console.log("devid:",devid);
             var devidstr = web3.utils.toAscii(devid);
             console.log("device id:",devidstr);
-            App.readmeasured(select, select2);
+
+            let iddata = {
+                "device_id": devidstr,
+                "building_id": buildingId
+            };
+
+            var jsf = await httpRequest("post", 'http://localhost:3000/id', JSON.stringify(iddata));
+            console.log(jsf); // this will show the info it in firebug console
+            var jsf2 = Math.floor(jsf.body);
+            console.log("Measured Temperature:" , jsf2);
+            App.addval(select, jsf2);
+            //App.readmeasured(select, select2);
         }
     },
 
-    readmeasured: async function (select, select2) {
-        var selstr = select.toString();
-        var sel2str = (select2+1).toString();
-        var base = "measured";
-        var measadd = base.concat(selstr.concat(sel2str));
-        //console.log(measadd);
-        //var jsf = $.getJSON(`./data/${measadd}.json`);
-        //var jsf = $.getJSON(`./data/measured11.json`);
-        //var jsf2 = JSON.parse(jsf);
-        // var jsf2 = jsf.responseJSON();
-        // console.log(jsf2);
-        $.getJSON(`./data/${measadd}.json`, function(json) {
-            var jsf = json;
-            console.log(jsf); // this will show the info it in firebug console
-            var jsf2 = Math.floor(parseFloat (jsf["data"][0]["attributes"]["value"]));
-            console.log("Measured Temperature:" , jsf2);
-            App.addval(select, jsf2);
+    // readmeasured: async function (select, select2) {
+    //     var selstr = select.toString();
+    //     var sel2str = (select2+1).toString();
+    //     var base = "measured";
+    //     var measadd = base.concat(selstr.concat(sel2str));
+    //     //console.log(measadd);
+    //     //var jsf = $.getJSON(`./data/${measadd}.json`);
+    //     //var jsf = $.getJSON(`./data/measured11.json`);
+    //     //var jsf2 = JSON.parse(jsf);
+    //     // var jsf2 = jsf.responseJSON();
+    //     // console.log(jsf2);
+    //     $.getJSON(`./data/${measadd}.json`, function(json) {
+    //         var jsf = json;
+    //         console.log(jsf); // this will show the info it in firebug console
+    //         var jsf2 = Math.floor(parseFloat (jsf["data"][0]["attributes"]["value"]));
+    //         console.log("Measured Temperature:" , jsf2);
+    //         App.addval(select, jsf2);
 
 
-        });
-        //console.log(jsf);
+    //     });
+    //     //console.log(jsf);
 
-        //console.log(token);
+    //     //console.log(token);
 
 
 
-    },
+    // },
 
     addval: async function (select, jsf2) {
 

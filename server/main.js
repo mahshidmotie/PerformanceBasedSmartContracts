@@ -14,29 +14,10 @@ const BASE_PATH = "https://api.buildingtwin.siemens.com/core/buildings";
 
 const http = require('http');
 const https = require('https');
-const data11 = require('../data/measured11.json');
-const data12 = require('../data/measured12.json');
-const data13 = require('../data/measured13.json');
-const data14 = require('../data/measured14.json');
-const data15 = require('../data/measured15.json');
-const data16 = require('../data/measured16.json');
-const data17 = require('../data/measured17.json');
-const data21 = require('../data/measured22.json');
-const data22 = require('../data/measured22.json');
-const data23 = require('../data/measured23.json');
-const data24 = require('../data/measured24.json');
-const data25 = require('../data/measured25.json');
-const data26 = require('../data/measured26.json');
-const data27 = require('../data/measured27.json');
-// app.use(cors({
-//     'allowedHeaders': ['sessionId', 'Content-Type'],
-//     'exposedHeaders': ['sessionId'],
-//     'origin': '*',
-//     'methods': 'GET,HEAD,PUT,PATCH,POST,DELETE',
-//     'preflightContinue': false
-//   })); // Use this after the variable declaration
+
 app.use(express.static('client'));
 app.use(express.static('build/contracts'));
+app.use(bodyParser.urlencoded({extended: true}));
 //app.use(express.bodyParser());
 var jsonParser = bodyParser.json();
 //app.options('*', cors());
@@ -44,104 +25,33 @@ app.get('/', (req, res) => {
     res.sendFile(`${__dirname}/client/index.html`);
   });
 
-  // app.get('*', (req, res) => {
-  //   res.status(404);
-  //   res.send('Ooops... this URL does not exist');
-  // });
-
-  app.get('/item',(req, res)=>{
-    //res.send(`a put request with /item route on port ${PORT}`);
-    var randomnumber=Math.random();
-    if (randomnumber>0.01){
-        res.send(' ' + randomnumber);
-    }
 
 
-});
-app.get('/',(req, res)=>{
-    //res.send(`a put request with /item route on port ${PORT}`);
-    var randomnumber=Math.random();
-    if (randomnumber>0.01){
-        console.log(' ' + randomnumber);
-    }
 
 
-});
-app.get('/data/measured11.json',(req, res)=>
-//first get the data from internal api
-res.json(data11)
-);
 
-app.get('/data/measured12.json',(req, res)=>
-//first get the data from internal api
-res.json(data12)
-);
-app.get('/data/measured13.json',(req, res)=>
-//first get the data from internal api
-res.json(data13)
-);
-app.get('/data/measured14.json',(req, res)=>
-//first get the data from internal api
-res.json(data14)
-);
-app.get('/data/measured15.json',(req, res)=>
-//first get the data from internal api
-res.json(data15)
-);
-app.get('/data/measured16.json',(req, res)=>
-//first get the data from internal api
-res.json(data16)
-);
-app.get('/data/measured17.json',(req, res)=>
-//first get the data from internal api
-res.json(data17)
-);
-app.get('/data/measured21.json',(req, res)=>
-//first get the data from internal api
-res.json(data21)
-);
-app.get('/data/measured22.json',(req, res)=>
-//first get the data from internal api
-res.json(data22)
-);
-app.get('/data/measured23.json',(req, res)=>
-//first get the data from internal api
-res.json(data23)
-);
-app.get('/data/measured24.json',(req, res)=>
-//first get the data from internal api
-res.json(data24)
-);
-app.get('/data/measured25.json',(req, res)=>
-//first get the data from internal api
-res.json(data25)
-);
-app.get('/data/measured26.json',(req, res)=>
-//first get the data from internal api
-res.json(data26)
-);
-app.get('/data/measured27.json',(req, res)=>
-//first get the data from internal api
-res.json(data27)
-);
 
 app.get('/token',(req, res)=>{
     res.json(gettoken())
 });
 
 app.post('/id', jsonParser, async (req, res)=>{
-   var deid= req.body.device_id;
-   console.log(`${deid}`);
+   var deid= (req.body.device_id);
+   var buiid= req.body.building_id;
+   //console.log(`${deid}`);
+   console.log(deid);
+   let deid2 = deid;
    //res.send(deid);
    var token = await gettoken();
    console.log(token);
-   var callres = await getObservationsByDatapointId(token, "f3d22a6c-8250-41e4-8e44-39a4ab5cb255", "66b080a1-a963-4c0f-8680-3705c633e88c");
+   var callres = await getObservationsByDatapointId(token, buiid, "B_01'EG'RS_EG_01_01'SENDEV'TR");
    assert.equal(callres.status, 200);
    body = callres.data;
     assert.equal(body.data.length, 1);
 
     assert.equal(body.data[0].type, "observation");
     console.log("value:",body.data[0].attributes.value);
+    res.send (body.data[0].attributes.value);
 });
 
 app.get('/measurement',async (req, res)=>{
@@ -307,7 +217,7 @@ function getRequest(token, method, path, data) {
   };
 
   async function getObservationsByDatapointId(token, buildingId, id) {
-    return getByFilter(token, buildingId, "observations", "measuredBy", id);
+    return getByFilter(token, buildingId, "observations", "measuredBy.source", id);
   };
 
   function getBasePath() {
