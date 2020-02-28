@@ -15,6 +15,7 @@ var request = require('request');
 //     console.log(results);
 //   };
 
+var contractAdd = "0x2b7C98Bf890B1AB93352E92948e8236064A9464D";
 
     function httpRequest(method, url, body = null) {
         if (!['get', 'post', 'head'].includes(method)) {
@@ -169,20 +170,7 @@ App = {
         //console.log("array32:", ar32);
         App.devices= ar32;
 
-        //App.casecheck = $("#case-check").val();
 
-
-        //console.log(App.devices);
-        // fs.writeFile(App.buildingId + ".json", App.devices, 'utf8', function (err) {
-        //     if (err) {
-        //         console.log("An error occured while writing JSON Object to File.");
-        //         return console.log(err);
-        //     }
-
-        //     console.log("JSON file has been saved.");
-        // });
-        //console.log("json device:", App.devices);
-        //console.log("json length:"App.devices["DeviceIds"].si );
     },
 
 
@@ -200,10 +188,7 @@ App = {
             App.metamaskAccountID = res[0];
 
         })
-        // console.log(web3);
-        // const accounts = await web3.eth.getAccounts();
-        // App.metamaskAccountID = accounts[0];
-        // console.log('getMetaskID:',App.metamaskAccountID);
+
     },
 
 
@@ -218,34 +203,9 @@ App = {
             //App.makewhitelist();
 
         });
+
         App.fetchEvents();
         App.AddRole = await App.contracts.AddRole.deployed();
-
-
-
-        // $.post({
-        //     headers: { 'content-type': 'application/json' },
-        //     url: 'http://localhost:3000/id',
-        //     body: JSON.stringify({
-        //         "device_id": "mahshid"
-        //     })
-        // }, function (err, response, body) {
-        //     if (err) {
-        //         console.error(err);
-        //         process.exit(1);
-        //     }
-
-        // });
-        //passid();
-        // $.getJSON(`http://localhost:3000/measurement`, function(json) {
-        //     var jsf = json;
-        //     console.log("COOL DATA",jsf);
-
-        // });
-        var a = 1;
-        App.decide(a);
-
-
 
         setInterval(() => {
             App.randcreat()
@@ -361,14 +321,14 @@ App = {
 
         App.getMetaskAccountID();
         App.val = jsf2;
+        const contractowner = await App.AddRole.contractOwner();
 
 
         App.contracts.AddRole.deployed().then(function(instance) {
             return instance.addValue(
                 select,
-
                 App.val,
-                {from: App.metamaskAccountID}
+                {from: contractowner}
             );
         }).then(function(result) {
             // $("#ftc-item").text(result[tx]);
@@ -674,14 +634,27 @@ App = {
             App.contracts.AddRole.deployed().then(function(instance) {
                 return instance.addDepo(
                     {from : App.OwnerAdd,
-                    value : App.depoAmount}
+                    value : (App.depoAmount-20)}
                 );
             }).then(function(result) {
                 // $("#ftc-item").text(result[tx]);
-                console.log('addDepo:',result);
+                console.log('addDepo1:',result);
             }).catch(function(err) {
                 console.log(err.message);
             });
+
+            App.contracts.AddRole.deployed().then(function(instance) {
+                return instance.addDepo2(
+                    {from : App.OwnerAdd
+                    }
+                );
+            }).then(function(result) {
+                // $("#ftc-item").text(result[tx]);
+                console.log('addDepo2:',result);
+            }).catch(function(err) {
+                console.log(err.message);
+            });
+
         }).catch(function(err) {
             console.log(err.message);
         });

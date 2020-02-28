@@ -24,7 +24,7 @@ contract AddRole {
   // Defining a struct 'architects' by inheriting from 'Roles' library, struct Role
   // Roles.Role private architects;
   // Roles.Role private contractors;
-  address payable private contractOwner;
+  address payable public contractOwner;
   uint public caseCount = 0;
   uint public measurmentCount = 0;
   uint public compareCount = 0;
@@ -126,6 +126,10 @@ contract AddRole {
     require (msg.value == 80 ether,"not enoug depo");
     //ContractAdd.transfer(msg.value);
     //Receive(msg.value);
+  }
+
+  function addDepo2() public payable {
+    contractOwner.transfer(20 ether);
   }
 
   function getarray(uint _select) public view returns (bytes32[] memory devids) {
