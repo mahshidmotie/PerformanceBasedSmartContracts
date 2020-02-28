@@ -136,7 +136,7 @@ App = {
     else {
         App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
     }
-        console.log(web3);
+        console.log(App.web3Provider);
 
         App.getMetaskAccountID();
 
@@ -242,6 +242,8 @@ App = {
         //     console.log("COOL DATA",jsf);
 
         // });
+        var a = 1;
+        App.decide(a);
 
 
 
@@ -310,7 +312,7 @@ App = {
             //console.log("select2",select2);
             var devid = bs[select2];
             //console.log("devid:",devid);
-            var devidstr = web3.utils.toAscii(devid);
+            var devidstr = web3.utils.hexToUtf8(devid);
             console.log("device id:",devidstr);
 
             let iddata = {

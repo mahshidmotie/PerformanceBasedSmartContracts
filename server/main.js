@@ -36,7 +36,7 @@ app.get('/token',(req, res)=>{
 });
 
 app.post('/id', jsonParser, async (req, res)=>{
-   var deid= (req.body.device_id);
+   var deid= req.body.device_id;
    var buiid= req.body.building_id;
    //console.log(`${deid}`);
    console.log(deid);
@@ -44,7 +44,8 @@ app.post('/id', jsonParser, async (req, res)=>{
    //res.send(deid);
    var token = await gettoken();
    console.log(token);
-   var callres = await getObservationsByDatapointId(token, buiid, "B_01'EG'RS_EG_01_01'SENDEV'TR");
+   //var callres = await getObservationsByDatapointId(token, buiid, "B_01'EG'RS_EG_01_01'SENDEV'TR");
+   var callres = await getObservationsByDatapointId(token, buiid, deid);
    assert.equal(callres.status, 200);
    body = callres.data;
     assert.equal(body.data.length, 1);
