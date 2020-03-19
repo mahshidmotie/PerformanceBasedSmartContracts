@@ -49,6 +49,7 @@ App = {
     // fetches field entries
     readForm: function () {
         App.ContAdd = $("#contractor-add").val();
+        App.FMAdd = $("#FM-add").val();
         App.OwnerAdd = $("#owner-add").val();
         App.buildingId = $("#Building-Id").val();
         /// T SetPoint
@@ -179,6 +180,13 @@ App = {
         App.fetchEvents();
         App.AddRole = await App.contracts.AddRole.deployed();
         console.log ("App.AddRole", App.AddRole);
+        
+    const FMFCount = (await App.AddRole.FMFCount()).toString();
+    const COFCount = (await App.AddRole.COFCount()).toString();
+    const AllfineCount = (await App.AddRole.AllfineCount()).toString();
+    console.log("FMFCount:", FMFCount);
+    console.log("COFCount:", COFCount);
+    console.log("AllfineCount:", AllfineCount);
         return App.bindEvents();
     },
 
@@ -261,23 +269,25 @@ App = {
    
 
     makeTx: async function (event) {
-        //App.getMetaskAccountID();
+        App.getMetaskAccountID();
         //console.log("Tx khast");
         App.casecheck2 = parseInt($("#case-check2").val());
-        var date = new Date($("#date").val());
-        App.unixTimeStamp = (Math.floor(date.getTime() / 1000));
+        App.COreceiver = $("#receiver1").val();
+        App.FMreceiver = $("#receiver2").val();
+        // App.unixTimeStamp = (Math.floor(date.getTime() / 1000));
         //App.unixTimeStamp = Date.parse($("#date").val());
         event.preventDefault();
         //var processId = parseInt($(event.target).data('id'));
         console.log(
             "Tx case-id:", App.casecheck2,
-            "due time:", App.unixTimeStamp
+            //"due time:", App.unixTimeStamp
         );
 
         await App.contracts.AddRole.deployed().then(function(instance) {
             return instance.makeTx(
                 App.casecheck2,
-                App.unixTimeStamp,
+                App.COreceiver,
+                App.FMreceiver,
                 {from: App.metamaskAccountID}
             );
         }).then(function(result) {
@@ -286,14 +296,20 @@ App = {
         }).catch(function(err) {
             console.log(err.message);
         });
-        const CC = (await App.AddRole.amount()).toString(10);
-        console.log("amount:", CC);
-        const CC2 = (await App.AddRole._to());
-        console.log("to address:", CC2);
-        const xtime = (await App.AddRole.amount()).toString(10);
-        console.log("amount paid:", xtime);
+        // const CC = (await App.AddRole.amount()).toString(10);
+        // console.log("amount:", CC);
+        // const CC2 = (await App.AddRole._to());
+        // console.log("to address:", CC2);
+        const paid = (await App.AddRole.amountCO()).toString(10);
+        console.log("amount paid CO:", paid);
+        const paid2 = (await App.AddRole.amountFM()).toString(10);
+        console.log("amount paid FM:", paid2);
+        const xtime = (await App.AddRole.xtime()).toString(10);
+        console.log("paid:", xtime);
+        const txnu = await App.AddRole.TxCount();
+        const Txtime = ((await App.AddRole.Txs(txnu))[5]).toString(10);
+        console.log("Tx time", Txtime);
     },
-    
 
     statusquo: async function (event) {
         
@@ -373,6 +389,7 @@ App = {
                     return instance.addCase(
                         App.OwnerAdd,
                         App.ContAdd,
+                        App.FMAdd,
                         App.buildingId,
                         App.TSetPdevices,
                         App.Tdevices,

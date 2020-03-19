@@ -6,6 +6,7 @@ contract AddRole {
   event CaseCreated(uint caseCount,
     address  Owner,
     address  Contractor,
+    address FM,
     string BuildingId,
     bytes32[] TsetIDs,
     bytes32[] TIDs,
@@ -21,11 +22,12 @@ contract AddRole {
   uint public measurmentCount = 0;
   //uint public compareCount = 0;
   //uint public diffCount = 0;
-  //uint public TxCount = 0;
+  uint public TxCount = 0;
   //uint public diff = 0;
   //uint public  size0 = 0;
-  //uint public amount = 0;
-  //uint public xtime = 0;
+  uint public amountCO = 0;
+  uint public amountFM = 0;
+  uint public xtime = 0;
   uint public FMFCount = 0;
   uint public COFCount = 0;
   uint public AllfineCount = 0;
@@ -33,7 +35,8 @@ contract AddRole {
   uint public COFaults = 0;
   uint public NoFault = 0;
 
-  address payable public _to;
+  address payable public _toCo;
+  address payable public _toFM;
   mapping (address => uint) private balances;
 
 //the buildings which should be observed are saved in this struct
@@ -41,6 +44,7 @@ contract AddRole {
     uint CaseNumber;
     address Owner;
     address payable Contractor;
+    address payable FM;
     string BuildingId;
     bytes32[] TsetIDs;
     bytes32[] TIDs;
@@ -118,8 +122,10 @@ contract AddRole {
     uint Txnumber;
     uint caseid;
     address from;
-    address to;
-    uint amount;
+    address toCo;
+    uint amCO;
+    address toFM;
+    uint amFM;
     uint time;
   }
   mapping(uint => TxEx) public Txs;
@@ -147,14 +153,14 @@ contract AddRole {
     }
 
   //adding a building and its information to the list to get checked
-  function addCase(address account1, address payable account2, string memory BI, bytes32[] memory TsetIDs, bytes32[] memory TIDs, 
-  bytes32[] memory RHuIDs, bytes32[] memory AQuIDs, uint depoam) public {
+  function addCase(address account1, address payable account2, address payable account3, string memory BI, bytes32[] memory TsetIDs,
+   bytes32[] memory TIDs, bytes32[] memory RHuIDs, bytes32[] memory AQuIDs, uint depoam) public {
     require (isWhitelisted(account1),"building owner is not a user");
     require (depoam == 80,"not enoug depo");
     caseCount ++;
     uint time = block.timestamp;
-    cases[caseCount] = CaseItem(caseCount, account1, account2, BI, TsetIDs, TIDs, RHuIDs, AQuIDs, time);
-    emit CaseCreated(caseCount, account1, account2, BI, TsetIDs, TIDs, RHuIDs, AQuIDs, time);
+    cases[caseCount] = CaseItem(caseCount, account1, account2, account3, BI, TsetIDs, TIDs, RHuIDs, AQuIDs, time);
+    emit CaseCreated(caseCount, account1, account2, account3, BI, TsetIDs, TIDs, RHuIDs, AQuIDs, time);
   }
 
   //adding depo into contract account to be transfered later to the contractor and facility manager
@@ -364,7 +370,7 @@ contract AddRole {
     
     return (FMFaults, COFaults, NoFault);
   }
-}
+
 // function checkstruct (uint _caseid) public returns (uint differences){
 //     for (uint i=1; i<(compareCount+1); i++)
 //     {
@@ -402,74 +408,97 @@ contract AddRole {
 //     return diff;
 //   }
 
-//   function makeTx (uint  caseNo, uint  duedate) public {
+  function makeTx (uint  caseNo, address payable COreceiver, address payable FMreceiver) public {
 
 
-//     xtime = cases[caseNo].time;
+    xtime = cases[caseNo].time;
 
-//     for (uint i=1; i<(TxCount+1); i++)
-//     {
-//       if ( Txs[uint(i)].caseid == caseNo && Txs[uint(i)].time > xtime)
-//       {
-//         xtime = Txs[uint(i)].time;
-//       }
-//     }
+    for (uint i=1; i<(TxCount+1); i++)
+    {
+      if ( Txs[uint(i)].caseid == caseNo && Txs[uint(i)].time > xtime)
+      {
+        xtime = Txs[uint(i)].time;
+      }
+    }
+    uint time = block.timestamp;
+    require((time-xtime)>=240, "You should wait at least four minute after your previous transaction");
+    for (uint i=1; i<(caseCount+1); i++)
+    {
+      if ( cases[uint(i)].CaseNumber == caseNo && cases[uint(i)].Contractor == COreceiver && cases[uint(i)].FM == FMreceiver)
+      {
+        _toCo = cases[uint(i)].Contractor;
+        _toFM = cases[uint(i)].FM;
+      }
+    }
+    uint totdiff1 = 0;
+    uint totdiff2 = 0;
+    uint maxamount = 0;
+    //uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
+    uint sixmonthamount = (5)*1000000000000000000;
+    if ((time-xtime) >= 240 && (time-xtime) < 480)
+    {
+      maxamount = sixmonthamount * 1;
+      time = xtime + 240;
+    }
+    else if ((time-xtime) >= 480 && (time-xtime) < 720)
+    {
+      maxamount = sixmonthamount * 2;
+      time = xtime + 480;
+    }
+    else if ((time-xtime) >= 720 && (time-xtime) < 960)
+    {
+      maxamount = sixmonthamount * 3;
+      time = xtime + 720;
+    }
+    else if ((time-xtime) >= 960 && (time-xtime) < 1200)
+    {
+      maxamount = sixmonthamount * 4;
+      time = xtime + 960;
+    }
+    else if ((time-xtime) >= 1200 && (time-xtime) < 1440)
+    {
+      maxamount = sixmonthamount * 5;
+      time = xtime + 1200;
+    }
+    else if ((time-xtime) >= 1440)
+    {
+      maxamount = sixmonthamount * 6;
+      time = xtime + 1440;
+    }
+    else{
+      maxamount = 0;
+    }
 
-// require((duedate-xtime)>60, "You should wait at least one minute after your previous transaction");
-//     for (uint i=1; i<(caseCount+1); i++)
-//     {
-//       if ( cases[uint(i)].CaseNumber == caseNo)
-//       {
-//         _to = cases[uint(i)].Contractor;
-//       }
-//     }
-//     uint totdiff = 0;
-//     //uint totamount = 80;
-//     //uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
-//     uint maxamount = (80*(duedate-xtime)/3600)*1000000000000000000;
+    for (uint i=1; i<(COFCount+1); i++)
+    {
+      // if ( FMF[uint(i)].caseid == caseNo && FMF[uint(i)].time > (xtime-1) && FMF[uint(i)].time < (time+1))
+      if ( COF[uint(i)].caseid == caseNo && COF[uint(i)].time < time && COF[uint(i)].time >= xtime )
+      {
+        totdiff1 ++;
+      }
+    }
 
-//     for (uint i=1; i<(diffCount+1); i++)
-//     {
-//       if ( diffs[uint(i)].caseid == caseNo && diffs[uint(i)].time > (xtime-1) && diffs[uint(i)].time < (duedate+1))
-//       {
-//         totdiff += diffs[uint(i)].diff;
-//       }
-//     }
+    for (uint i=1; i<(FMFCount+1); i++)
+    {
+      // if ( FMF[uint(i)].caseid == caseNo && FMF[uint(i)].time > (xtime-1) && FMF[uint(i)].time < (time+1))
+      if ( FMF[uint(i)].caseid == caseNo && FMF[uint(i)].time < time && FMF[uint(i)].time >= xtime )
+      {
+        totdiff2 ++;
+      }
+    }
 
-//     amount = maxamount-(totdiff*1000000000000000000/8);
-//     //amount = 2*1000000000000000000;
+    amountCO = maxamount-(totdiff1*1000000000000000000/10);
+    amountFM = maxamount-(totdiff2*1000000000000000000/10);
+    //amount = 2*1000000000000000000;
 
 
-//     TxCount ++;
-//     Txs[TxCount] = TxEx (TxCount, caseNo, contractOwner, _to, amount, duedate);
+    TxCount ++;
+    Txs[TxCount] = TxEx (TxCount, caseNo, contractOwner, _toCo, amountCO, _toFM, amountFM, time);
 
-//     _to.transfer(amount);
-//     //emit CaseCreated(caseCount, account1, account2, BI, DeIDs);
+    _toCo.transfer(amountCO);
+    _toFM.transfer(amountFM);
+    //emit CaseCreated(caseCount, account1, account2, BI, DeIDs);
 
-//   }
+  }
+}
 
-  // function checkdata (uint meassize, string memory _caseid, uint size0) public returns (uint diff) {
-  //   diff = 0;
-
-  //   for (uint i = size0; i< meassize ; i++)
-  //   {
-  //     if (keccak256(abi.encodePacked((values[i].caseid)))  == keccak256(abi.encodePacked((_caseid)))  && values[i].temp < 15)
-  //     {
-  //       diff = diff + (15-values[i].temp);
-  //     }
-  //     if (keccak256(abi.encodePacked((values[i].caseid)))  == keccak256(abi.encodePacked((_caseid))) && values[i].temp > 25)
-  //     {
-  //       diff = diff + (values[i].temp-25);
-  //     }
-  //   }
-  //   uint checktime = block.timestamp;
-  //   diffCount ++;
-  //   diffs[diffCount] = diffcal (diffCount, diff, _caseid, checktime);
-  //   return diff;
-
-  // }
-
-  // // Define a function 'renounceArchitect' to renounce this role
-  // function renounceArchitect() public {
-  //   _removeArchitect(msg.sender);
-  // }

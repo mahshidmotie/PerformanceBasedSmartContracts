@@ -60,7 +60,7 @@ async function decide (randomnumber){
         console.log(select);
         const item = await AddRoledep.cases(select);
         let bs = await AddRoledep.getarray(select);
-        const buildingId = item[3];
+        const buildingId = item[4];
         console.log("buildingId:",buildingId);
         // *** if you need to read 3 rooms of a building
         // for (i=0; i<3; i++)
@@ -275,17 +275,11 @@ async function decide (randomnumber){
 }
 
 
-app.get('/random', jsonParser, async (req, res)=>{
-    const AddRoledep = await AddRole.deployed();
-    const FMFCount = (await AddRoledep.FMFCount()).toString();
-    const COFCount = (await AddRoledep.COFCount()).toString();
-    const AllfineCount = (await AddRoledep.AllfineCount()).toString();
-    console.log("FMFCount:", FMFCount);
-    console.log("COFCount:", COFCount);
-    console.log("AllfineCount:", AllfineCount);
+app.get('/random', jsonParser, (req, res)=>{
+    
     setInterval(() => {
         randcreat();
-    }, 60000);
+    }, 90000);
     
 });
 
