@@ -6,7 +6,7 @@ const http = require('http');
 const https = require('https');
 
 App = {
-   
+
 
     web3Provider: null,
     contracts: {},
@@ -34,7 +34,7 @@ App = {
         console.log("if 2");
         App.web3Provider = window.web3.currentProvider;
     }
-    
+
     else {
         console.log("if 3");
         App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
@@ -55,7 +55,7 @@ App = {
         /// T SetPoint
         var a= $("#Device1").val();
         var Device = JSON.parse( a) ;
-        
+
         //console.log(Device.data);
         var length = Object.keys(Device.data).length;
         console.log("length:",  Object.keys(Device.data).length);
@@ -71,7 +71,7 @@ App = {
             // ar[i+length+length+length+length]= splittedid[4];
             ar[i]= Device.data[i].attributes.source.id;
         }
-        
+
         for (i=0; i<length; i++)
         {//////////in case for readinf dlt ids
             // ar32[i]= web3.utils.asciiToHex((ar[i]).concat("-",(ar[i+length]).concat("-",(ar[i+length+length]))));
@@ -79,12 +79,12 @@ App = {
             ar32[i]= web3.utils.asciiToHex((ar[i]));
 
         }
-        
+
         App.TSetPdevices= ar32;
         // Room T
         var a= $("#Device2").val();
         var Device = JSON.parse( a) ;
-        
+
         console.log(Device.data);
         var length = Object.keys(Device.data).length;
         console.log("length:",  Object.keys(Device.data).length);
@@ -94,7 +94,7 @@ App = {
         {
             ar[i]= Device.data[i].attributes.source.id;
         }
-        
+
         for (i=0; i<length; i++)
         {
             ar32[i]= web3.utils.asciiToHex((ar[i]));
@@ -107,7 +107,7 @@ App = {
         var length = Object.keys(Device.data).length;
         console.log(Device.data);
         console.log("length:",  Object.keys(Device.data).length);
-        
+
         var ar = new Array;
         var ar32 = new Array;
         for (i=0; i<length; i++)
@@ -128,7 +128,7 @@ App = {
         var Device = JSON.parse( a) ;
         var length = Object.keys(Device.data).length;
         console.log(Device.data);
-   
+
         console.log("length:",  Object.keys(Device.data).length);
         var ar = new Array;
         var ar32 = new Array;
@@ -180,9 +180,9 @@ App = {
         App.fetchEvents();
         App.AddRole = await App.contracts.AddRole.deployed();
         console.log ("App.AddRole", App.AddRole);
-        
-    const FMFCount = (await App.AddRole.FMFCount()).toString();
-    const COFCount = (await App.AddRole.COFCount()).toString();
+
+    const FMFCount = (await App.AddRole.FMFCount()).toString(10);
+    const COFCount = (await App.AddRole.COFCount()).toString(10);
     const AllfineCount = (await App.AddRole.AllfineCount()).toString();
     console.log("FMFCount:", FMFCount);
     console.log("COFCount:", COFCount);
@@ -195,8 +195,9 @@ App = {
 
             $('#button1').click(App.handleButtonClick);
             $('#button2').click(App.adduser);
-            $('#button3').click(App.statusquo);
-            $('#button4').click(App.getCompList);
+            $('#button3').click(App.statusquoFM);
+            $('#button4').click(App.statusquoCO);
+            $('#button6').click(App.statusquoAll);
             $('#button5').click(App.makeTx);
             //$('#buttonMessage').click(App.loadMessage);
 
@@ -243,7 +244,7 @@ App = {
 
         switch(processId) {
             case 1:
-                return await App.createObject(event);
+                return await App.statusquoAll(event);
                 break;
             case 2:
                 return await App.fillItem(event);
@@ -252,10 +253,10 @@ App = {
                 return await App.makeTx(event);
                 break;
             case 4:
-                return await App.getCompList(event);
+                return await App.statusquoCO(event);
                 break;
             case 5:
-                return await App.statusquo(event);
+                return await App.statusquoFM(event);
                 break;
             case 6:
                 return await App.addCase(event);
@@ -266,12 +267,12 @@ App = {
             }
     },
 
-   
+
 
     makeTx: async function (event) {
         App.getMetaskAccountID();
         //console.log("Tx khast");
-        App.casecheck2 = parseInt($("#case-check2").val());
+        App.casecheck2 = $("#case-check2").val();
         App.COreceiver = $("#receiver1").val();
         App.FMreceiver = $("#receiver2").val();
         // App.unixTimeStamp = (Math.floor(date.getTime() / 1000));
@@ -290,69 +291,163 @@ App = {
                 App.FMreceiver,
                 {from: App.metamaskAccountID}
             );
-        }).then(function(result) {
+        }).then( async function(result) {
             // $("#ftc-item").text(result[tx]);
             console.log('execute tx',result);
+            const paid = (await App.AddRole.amountCO()).toString(10);
+        console.log("amount paid CO:", paid);
+        const paid2 = (await App.AddRole.amountFM()).toString(10);
+        console.log("amount paid FM:", paid2);
+        const state = (await App.AddRole.state()).toString(10);
+        console.log("state:", state);
+        const stime = (await App.AddRole.stime()).toString(10);
+        console.log("stime:", stime);
+        const xtime = (await App.AddRole.xtime()).toString(10);
+        console.log("xtime:", xtime);
+        const txnu = await App.AddRole.TxCount();
+        const Txtime = ((await App.AddRole.Txs(txnu))[7]).toString(10);
+        console.log("Tx time", Txtime);
+        const boo = ((await App.AddRole.b())).toString(10);
+        console.log("boolean", boo);
         }).catch(function(err) {
             console.log(err.message);
         });
-        // const CC = (await App.AddRole.amount()).toString(10);
-        // console.log("amount:", CC);
-        // const CC2 = (await App.AddRole._to());
-        // console.log("to address:", CC2);
+
+        
+        
         const paid = (await App.AddRole.amountCO()).toString(10);
         console.log("amount paid CO:", paid);
         const paid2 = (await App.AddRole.amountFM()).toString(10);
         console.log("amount paid FM:", paid2);
+        const state = (await App.AddRole.state()).toString(10);
+        console.log("state:", state);
+        const stime = (await App.AddRole.stime()).toString(10);
+        console.log("stime:", stime);
         const xtime = (await App.AddRole.xtime()).toString(10);
-        console.log("paid:", xtime);
+        console.log("xtime:", xtime);
         const txnu = await App.AddRole.TxCount();
-        const Txtime = ((await App.AddRole.Txs(txnu))[5]).toString(10);
+        const Txtime = ((await App.AddRole.Txs(txnu))[7]).toString(10);
         console.log("Tx time", Txtime);
+        const boo = ((await App.AddRole.b())).toString(10);
+        console.log("boolean", boo);
     },
 
-    statusquo: async function (event) {
-        
-        App.casecheck = parseInt($("#case-check").val());
+    statusquoFM: async function (event) {
+
+        App.casecheck = $("#case-check").val();
         var chs = new Date($("#check-start").val());
         App.checkstart = (Math.floor(chs.getTime() / 1000));
         var che = new Date($("#check-end").val());
         App.checkend = (Math.floor(che.getTime() / 1000));
-        
+
         event.preventDefault();
         console.log(
             "case-id:", App.casecheck,
         );
 
- 
-        await App.contracts.AddRole.deployed().then(function(instance) {
-            return instance.statusQuo(
+
+        App.contracts.AddRole.deployed().then(function(instance) {
+            return instance.statusQuoFM(
                 App.casecheck,
                 App.checkstart,
                 App.checkend,
                 {from: App.metamaskAccountID}
             );
-        }).then(function(result) {
+        }).then(async function(result) {
             // $("#ftc-item").text(result[tx]);
             console.log('casecheck:',result);
+                    var FMF = (await App.AddRole.FMFaults()).toNumber(10);
+
+        console.log("For Case 1 the minus points for Facility Manager are: ",FMF, " .");
+
+        var node = document.createElement("li");
+        var textnode = document.createTextNode("CaseId: " + App.casecheck +"  the minus points for Facility Manager are: "+FMF+ " .");
+        node.appendChild(textnode);
+        document.getElementById("myList").appendChild(node);
         }).catch(function(err) {
             console.log(err.message);
         });
-        const FMF = (await App.AddRole.FMFaults()).toString(10);
+    },
+    statusquoCO: async function (event) {
+
+        App.casecheck = $("#case-check").val();
+        var chs = new Date($("#check-start").val());
+        App.checkstart = (Math.floor(chs.getTime() / 1000));
+        var che = new Date($("#check-end").val());
+        App.checkend = (Math.floor(che.getTime() / 1000));
+
+        event.preventDefault();
+        console.log(
+            "case-id:", App.casecheck,
+        );
+
+
+        App.contracts.AddRole.deployed().then(function(instance) {
+            return instance.statusQuoCO(
+                App.casecheck,
+                App.checkstart,
+                App.checkend,
+                {from: App.metamaskAccountID}
+            );
+        }).then(async function(result) {
+            // $("#ftc-item").text(result[tx]);
+            console.log('casecheck:',result);
+
         const COF = (await App.AddRole.COFaults()).toString(10);
-        const NoF = (await App.AddRole.NoFault()).toString(10);
-        console.log("For Case 1 the minus points for Facility Manager are: ",FMF, ", for Contratcor are: ", COF,", and for non are:" , NoF);
+
+        console.log("For Case 1 the minus points Contratcor are: ", COF," .");
 
         var node = document.createElement("li");
-        var textnode = document.createTextNode("CaseId: " + App.casecheck +"  the minus points for Facility Manager are: "+FMF+ ", for Contratcor are: "+ COF+", and for non are:" +NoF);
+        var textnode = document.createTextNode("CaseId: " + App.casecheck +"  the minus points for Contratcor are: "+ COF+" ." );
         node.appendChild(textnode);
         document.getElementById("myList").appendChild(node);
-      
+        }).catch(function(err) {
+            console.log(err.message);
+        });
+
     },
+
+    statusquoAll: async function (event) {
+
+        App.casecheck = $("#case-check").val();
+        var chs = new Date($("#check-start").val());
+        App.checkstart = (Math.floor(chs.getTime() / 1000));
+        var che = new Date($("#check-end").val());
+        App.checkend = (Math.floor(che.getTime() / 1000));
+
+        event.preventDefault();
+        console.log(
+            "case-id:", App.casecheck,
+        );
+
+
+        App.contracts.AddRole.deployed().then(function(instance) {
+            return instance.statusQuoAll(
+                App.casecheck,
+                App.checkstart,
+                App.checkend,
+                {from: App.metamaskAccountID}
+            );
+        }).then(async function(result) {
+            // $("#ftc-item").text(result[tx]);
+            console.log('casecheck:',result);
+
+        const NoF = (await App.AddRole.NoFault()).toString(10);
+        console.log("For Case 1 the minus points non are:" , NoF, " .");
+
+        var node = document.createElement("li");
+        var textnode = document.createTextNode("CaseId: " + App.casecheck +"  the minus points for non are:" +NoF+" .");
+        node.appendChild(textnode);
+        document.getElementById("myList").appendChild(node);
+        }).catch(function(err) {
+            console.log(err.message);
+        });
+    },
+
 
     addCase: async function (event) {
         event.preventDefault();
-        
+
         console.log(
             "Owner address:", App.OwnerAdd,
             "Contractor address:", App.ContAdd,
@@ -364,7 +459,7 @@ App = {
             App.depoAmount2 = 20 * 1000000000000000000;
 
            }
-           
+
 
            App.contracts.AddRole.deployed().then(function(instance) {
             return instance.addDepo(
@@ -409,7 +504,7 @@ App = {
                 console.log(err.message);
             });
 
-            
+
 
 
 
@@ -505,8 +600,8 @@ App = {
 
 
     },
-    
-    
+
+
     fetchEvents: function () {
         if (typeof App.contracts.AddRole.currentProvider.sendAsync !== "function") {
             App.contracts.AddRole.currentProvider.sendAsync = function () {
@@ -582,7 +677,7 @@ App = {
 
 //****************************************************************************** */
 ///***************************************not in use
-    // getCompList: async function (event) { 
+    // getCompList: async function (event) {
     //     //App.getMetaskAccountID();
     //     //console.log("list khast");
     //     App.casecheck = parseInt($("#case-check").val());

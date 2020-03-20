@@ -34,6 +34,9 @@ contract AddRole {
   uint public FMFaults = 0;
   uint public COFaults = 0;
   uint public NoFault = 0;
+  uint public state = 0;
+  uint public stime = 0;
+  bool public b = false;
 
   address payable public _toCo;
   address payable public _toFM;
@@ -61,9 +64,9 @@ contract AddRole {
 //measured value of different buildings are here
   struct TempVals {
     uint measurmentnumber;
-    uint caseid;
     bytes32 devids;
     uint[] measures;
+    string buid;
   }
 
   mapping(uint => TempVals) public values;
@@ -71,9 +74,9 @@ contract AddRole {
   // the faults of the facility manager
   struct FMFs {
     uint FMFnumber;
-    uint caseid;
     bytes32 devid;
     uint time;
+    string buid;
   }
   mapping(uint => FMFs) public FMF;
 
@@ -82,45 +85,24 @@ contract AddRole {
   //the faults of the contractor
   struct COFs {
     uint COFnumber;
-    uint caseid;
     bytes32 devid;
     uint time;
+    string buid;
     }
   mapping(uint => COFs) public COF;
 
   //no ones fault
   struct Allfines {
     uint Allfinenumber;
-    uint caseid;
     bytes32 devid;
     uint time;
+    string buid;
   }
   mapping(uint => Allfines) public Allfine;
 
-  
-
-  
-
-  struct compareask {
-    uint comparenumber;
-    uint caseid;
-    uint time;
-    uint measize;
-  }
-
-  mapping(uint => compareask) public asks;
-
-  struct diffcal {
-    uint diffcalnumber;
-    uint diff;
-    uint caseid;
-    uint time;
-  }
-  mapping(uint => diffcal) public diffs;
-
   struct TxEx {
     uint Txnumber;
-    uint caseid;
+    string buid;
     address from;
     address toCo;
     uint amCO;
@@ -212,9 +194,9 @@ contract AddRole {
   }
 
 // adding measurement of sesnors and comparing them to the accepted range
- function addValue (uint  caseNo, bytes32 devid, uint[] memory measures ) public {
+ function addValue (bytes32 devid, uint[] memory measures, string memory buid ) public {
     measurmentCount ++;
-    values[measurmentCount] = TempVals (measurmentCount, caseNo, devid, measures);
+    values[measurmentCount] = TempVals (measurmentCount, devid, measures, buid);
     uint time = block.timestamp;
 
     //here we check diffrent measures
@@ -223,16 +205,16 @@ contract AddRole {
         if(measures[1]>=205)
         {
           FMFCount ++;
-          FMF[FMFCount] = FMFs(FMFCount, caseNo, devid, time);
+          FMF[FMFCount] = FMFs(FMFCount, devid, time, buid);
         }
         else if(measures[1]<205 && measures[1]!=0)
         {
           COFCount ++;
-          COF[COFCount] = COFs(COFCount, caseNo, devid, time);
+          COF[COFCount] = COFs(COFCount, devid, time, buid);
         }
         else{
           AllfineCount ++;
-          Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devid, time);
+          Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
         }
       }
       else if ( measures[0]<210 && measures[0]!=0)
@@ -240,17 +222,17 @@ contract AddRole {
         if(((measures[1]>=185 && measures[1]<=245) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2]>=400 && measures[2]<=600) || measures[2]==10000 || measures[2]==0 ) && (measures[3] <= 1000 || measures[3] == 10000 || measures[3] == 0))
         {
           AllfineCount ++;
-          Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devid, time);
+          Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
         }
         else if(measures[1]<185 )
         {
           FMFCount ++;
-          FMF[FMFCount] = FMFs(FMFCount, caseNo, devid, time);
+          FMF[FMFCount] = FMFs(FMFCount, devid, time, buid);
         }
         else
         {
           COFCount ++;
-          COF[COFCount] = COFs(COFCount, caseNo, devid, time);
+          COF[COFCount] = COFs(COFCount, devid, time, buid);
         }
       }
       else if ( measures[0]<=225 && measures[0]>=210)
@@ -258,230 +240,174 @@ contract AddRole {
         if(((measures[1]>=185 && measures[1]<=245) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2] >= 400 && measures[2]<= 600) || measures[2] == 10000 || measures[2] == 0 ) && (measures[3]<= 1000 || measures[3] == 10000 || measures[3] == 0))
         {
           AllfineCount ++;
-          Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devid, time);
+          Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
         }
         else
         {
           COFCount ++;
-          COF[FMFCount] = COFs(COFCount, caseNo, devid, time);
+          COF[FMFCount] = COFs(COFCount, devid, time, buid);
         }
       }
       else{
         AllfineCount ++;
-        Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devid, time);
+        Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
       }
   }
-
-    //emit CaseCreated(caseCount, account1, account2, BI, DeIDs);
-  
-  //***********this add value function id for the case of 3 room measurement 
-  // function addValue (uint  caseNo, bytes32[] memory devids, uint[] memory measures ) public {
-  //   measurmentCount ++;
-  //   values[measurmentCount] = TempVals (measurmentCount, caseNo, devids, measures);
-  //   uint time = block.timestamp;
-
-  //   for (uint i=0; i<3; i++){
-  //     uint i4 = i*4;
-  //     if ( measures[i4]>225)
-  //     {
-  //       if(measures[i4+1]>=205)
-  //       {
-  //         FMFCount ++;
-  //         FMF[FMFCount] = FMFs(FMFCount, caseNo, devids[i], time);
-  //       }
-  //       else if(measures[i4+1]<205 && measures[i4+1]!=0)
-  //       {
-  //         COFCount ++;
-  //         COF[COFCount] = COFs(COFCount, caseNo, devids[i], time);
-  //       }
-  //       else{
-  //         AllfineCount ++;
-  //         Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devids[i], time);
-  //       }
-  //     }
-  //     else if ( measures[i4]<210 && measures[i4]!=0)
-  //     {
-  //       if(((measures[i4+1]>=185 && measures[i4+1]<=245) || measures[i4+1] ==10000 || measures[i4+1] ==0 ) && ((measures[i4+2]>=400 && measures[i4+2]<=600) || measures[i4+2]==10000 || measures[i4+2]==0 ) && (measures[i4+3]<= 1000 || measures[i4+3]== 10000 || measures[i4+3]== 0))
-  //       {
-  //         AllfineCount ++;
-  //         Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devids[i], time);
-  //       }
-  //       else if(measures[i4+1]<185 )
-  //       {
-  //         FMFCount ++;
-  //         FMF[FMFCount] = FMFs(FMFCount, caseNo, devids[i], time);
-  //       }
-  //       else
-  //       {
-  //         COFCount ++;
-  //         COF[COFCount] = COFs(COFCount, caseNo, devids[i], time);
-  //       }
-  //     }
-  //     else if ( measures[i4]<=225 && measures[i4]>=210)
-  //     {
-  //       if(((measures[i4+1]>=185 && measures[i4+1]<=245) || measures[i4+1] ==10000 || measures[i4+1] ==0 ) && ((measures[i4+2]>=400 && measures[i4+2]<=600) || measures[i4+2]==10000 || measures[i4+2]==0 ) && (measures[i4+3]<= 1000 || measures[i4+3]== 10000 || measures[i4+3]== 0))
-  //       {
-  //         AllfineCount ++;
-  //         Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devids[i], time);
-  //       }
-  //       else
-  //       {
-  //         COFCount ++;
-  //         COF[FMFCount] = COFs(COFCount, caseNo, devids[i], time);
-  //       }
-  //     }
-  //     else{
-  //       AllfineCount ++;
-  //       Allfine[AllfineCount] = Allfines(AllfineCount, caseNo, devids[i], time);
-  //     }
-  //   }
-
-  //   //emit CaseCreated(caseCount, account1, account2, BI, DeIDs);
-  // } *****************/
-
-  function statusQuo (uint _caseid, uint checkstart, uint checkend) public returns (uint FMFaults, uint COFaults, uint NoFaults){
+  function statusQuoFM (string memory _buid, uint checkstart, uint checkend) public {
     FMFaults = 0;
-    COFaults = 0;
-    NoFault = 0;
     for (uint i = 1; i<(FMFCount+1); i++)
     {
-      if (FMF[i].caseid == _caseid && FMF[i].time <= checkend && FMF[i].time >= checkstart)
+      if (keccak256(abi.encodePacked((FMF[i].buid))) == keccak256(abi.encodePacked((_buid))) &&
+      FMF[i].time <= checkend && FMF[i].time >= checkstart)
       {
         FMFaults ++;
       }
-      
     }
+  }
+   function statusQuoCO (string memory _buid, uint checkstart, uint checkend) public {
+    COFaults = 0;
+
     for (uint i = 1; i<(COFCount+1); i++)
     {
-      if (COF[i].caseid == _caseid && COF[i].time <= checkend && COF[i].time >= checkstart)
+      if (keccak256(abi.encodePacked((COF[i].buid))) == keccak256(abi.encodePacked((_buid))) &&
+      COF[i].time <= checkend && COF[i].time >= checkstart)
       {
         COFaults ++;
       }
-      
     }
+  }
+   function statusQuoAll (string memory _buid, uint checkstart, uint checkend) public {
+    NoFault = 0;
     for (uint i = 1; i<(AllfineCount+1); i++)
     {
-      if (Allfine[i].caseid == _caseid && Allfine[i].time <= checkend && Allfine[i].time >= checkstart)
+      if (keccak256(abi.encodePacked((Allfine[i].buid))) == keccak256(abi.encodePacked((_buid))) &&
+      Allfine[i].time <= checkend && Allfine[i].time >= checkstart)
       {
         NoFault ++;
       }
     }
-
-    
-    return (FMFaults, COFaults, NoFault);
   }
 
-// function checkstruct (uint _caseid) public returns (uint differences){
-//     for (uint i=1; i<(compareCount+1); i++)
-//     {
-//       if ( asks[uint(i)].caseid == _caseid && asks[uint(i)].measize > size0)
-//       {
-//         size0 = asks[uint(i)].measize;
-//       }
-//     }
-//     uint checktime = block.timestamp;
-//     compareCount ++;
-//     uint meassize = measurmentCount;
-//     asks[compareCount] = compareask (compareCount, _caseid, checktime,meassize);
-
-//     diff = 0;
-
-//     for (uint i = size0+1; i<(meassize+1); i++)
-//     {
-//       if (values[i].caseid == _caseid && values[i].temp < 15)
-//       {
-//         diff += (15-values[i].temp);
-//       }
-//       if (values[i].caseid == _caseid && values[i].temp > 25)
-//       {
-//         diff += (values[i].temp-25);
-//       }
-//     }
-
-//     //uint checktime = block.timestamp;
-//     diffCount ++;
-//     diffs[diffCount] = diffcal (diffCount, diff, _caseid, checktime);
-//     //return diff;
-
-//     //uint diff = checkdata (meassize, _caseid, size0);
-//     emit diffcalculated (diff);
-//     return diff;
-//   }
-
-  function makeTx (uint  caseNo, address payable COreceiver, address payable FMreceiver) public {
 
 
-    xtime = cases[caseNo].time;
-
-    for (uint i=1; i<(TxCount+1); i++)
-    {
-      if ( Txs[uint(i)].caseid == caseNo && Txs[uint(i)].time > xtime)
-      {
-        xtime = Txs[uint(i)].time;
-      }
-    }
-    uint time = block.timestamp;
-    require((time-xtime)>=240, "You should wait at least four minute after your previous transaction");
+  function makeTx (string memory _buid, address payable COreceiver, address payable FMreceiver) public {
+    b = false;
+    uint Cid = 0;
     for (uint i=1; i<(caseCount+1); i++)
     {
-      if ( cases[uint(i)].CaseNumber == caseNo && cases[uint(i)].Contractor == COreceiver && cases[uint(i)].FM == FMreceiver)
+      if ( keccak256(abi.encodePacked(( cases[uint(i)].BuildingId))) == keccak256(abi.encodePacked((_buid))) &&
+      cases[uint(i)].Contractor == COreceiver && cases[uint(i)].FM == FMreceiver)
       {
+        Cid = i;
         _toCo = cases[uint(i)].Contractor;
         _toFM = cases[uint(i)].FM;
+        xtime = cases[uint(i)].time;
+        stime = xtime;
+        b = true;
+        state = 1;
       }
     }
+    require (b == true, "Wrong building Id");
+    state = 2;
+    uint time = block.timestamp;
+
+    
+    state = 3;
+    for (uint i = 1; i<(TxCount+1); i++)
+    {
+      if ( keccak256(abi.encodePacked(( Txs[uint(i)].buid))) == keccak256(abi.encodePacked((_buid))) && Txs[uint(i)].time > xtime)
+      {
+        xtime = Txs[uint(i)].time;
+
+      }
+
+    }
+    require ((time-xtime)>=240, "You should wait at least four minute after your previous transaction");
     uint totdiff1 = 0;
     uint totdiff2 = 0;
     uint maxamount = 0;
     //uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
     uint sixmonthamount = (5)*1000000000000000000;
-    if ((time-xtime) >= 240 && (time-xtime) < 480)
-    {
+    if ((time - stime) <= 1440 ){
+      state = 4;
+      if ((time-xtime) >= 240 && (time-xtime) < 480)
+      {
       maxamount = sixmonthamount * 1;
       time = xtime + 240;
-    }
-    else if ((time-xtime) >= 480 && (time-xtime) < 720)
-    {
+      }
+      else if ((time-xtime) >= 480 && (time-xtime) < 720 )
+      {
       maxamount = sixmonthamount * 2;
       time = xtime + 480;
-    }
-    else if ((time-xtime) >= 720 && (time-xtime) < 960)
-    {
+      }
+      else if ((time-xtime) >= 720 && (time-xtime) < 960 )
+      {
       maxamount = sixmonthamount * 3;
       time = xtime + 720;
-    }
-    else if ((time-xtime) >= 960 && (time-xtime) < 1200)
-    {
+      }
+      else if ((time-xtime) >= 960 && (time-xtime) < 1200 )
+      {
       maxamount = sixmonthamount * 4;
       time = xtime + 960;
-    }
-    else if ((time-xtime) >= 1200 && (time-xtime) < 1440)
-    {
+      }
+      else if ((time-xtime) >= 1200 && (time-xtime) < 1440)
+      {
       maxamount = sixmonthamount * 5;
       time = xtime + 1200;
-    }
-    else if ((time-xtime) >= 1440)
-    {
-      maxamount = sixmonthamount * 6;
-      time = xtime + 1440;
-    }
-    else{
+      }
+      else {
       maxamount = 0;
+      state = 5;
+      }
     }
-
-    for (uint i=1; i<(COFCount+1); i++)
+    else  {
+      state = 6;
+      if (xtime == stime){
+        maxamount = sixmonthamount * 6;
+      }
+      else if ((xtime-stime) == 240){
+        maxamount = sixmonthamount * 5;
+      }
+      else if ((xtime-stime) == 480){
+        maxamount = sixmonthamount * 4;
+      }
+      else if ((xtime-stime) == 720){
+        maxamount = sixmonthamount * 3;
+      }
+      else if ((xtime-stime) == 960){
+        maxamount = sixmonthamount * 2;
+      }
+      else if ((xtime-stime) == 1200){
+        maxamount = sixmonthamount * 1;
+      }
+      else{
+        maxamount = 0;
+        state = 7;
+      }
+      time = stime+1440;
+      //cases.remove(Cid);
+      for (uint i = Cid; i<(caseCount); i++)
+      {
+        cases[i+1].CaseNumber = i;
+        cases[i] = cases[i+1];
+      }
+      caseCount = caseCount-1;
+    }
+    for (uint i = 1; i<(COFCount+1); i++)
     {
       // if ( FMF[uint(i)].caseid == caseNo && FMF[uint(i)].time > (xtime-1) && FMF[uint(i)].time < (time+1))
-      if ( COF[uint(i)].caseid == caseNo && COF[uint(i)].time < time && COF[uint(i)].time >= xtime )
+      if ( keccak256(abi.encodePacked(( COF[uint(i)].buid))) == keccak256(abi.encodePacked((_buid))) && COF[uint(i)].time < time &&
+      COF[uint(i)].time >= xtime )
       {
         totdiff1 ++;
       }
     }
 
-    for (uint i=1; i<(FMFCount+1); i++)
+    for (uint i = 1; i<(FMFCount+1); i++)
     {
       // if ( FMF[uint(i)].caseid == caseNo && FMF[uint(i)].time > (xtime-1) && FMF[uint(i)].time < (time+1))
-      if ( FMF[uint(i)].caseid == caseNo && FMF[uint(i)].time < time && FMF[uint(i)].time >= xtime )
+      if ( keccak256(abi.encodePacked(( FMF[uint(i)].buid))) == keccak256(abi.encodePacked((_buid))) &&
+      FMF[uint(i)].time < time && FMF[uint(i)].time >= xtime )
       {
         totdiff2 ++;
       }
@@ -493,12 +419,12 @@ contract AddRole {
 
 
     TxCount ++;
-    Txs[TxCount] = TxEx (TxCount, caseNo, contractOwner, _toCo, amountCO, _toFM, amountFM, time);
+    Txs[TxCount] = TxEx (TxCount, _buid, contractOwner, _toCo, amountCO, _toFM, amountFM, time);
 
     _toCo.transfer(amountCO);
     _toFM.transfer(amountFM);
     //emit CaseCreated(caseCount, account1, account2, BI, DeIDs);
 
   }
-}
+ }
 

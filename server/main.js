@@ -259,9 +259,9 @@ async function decide (randomnumber){
 
         AddRole.deployed().then(function(instance) {
             return instance.addValue(
-                select,
                 devid,
                 measus,
+                buildingId,
                 {from: contractowner}
             );
         }).then(function(result) {

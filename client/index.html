@@ -14,7 +14,7 @@
         <div class="form-group">
             Building Owner Address
             <br>
-            <input type="text" id="user-add" name="address" value=0x00000000000000000000000000000000000000><br>
+            <input type="text" id="user-add" name="address" value=0x395d3224962EDDEFfDd0f5DdFF3e1d6885b76058><br>
             <div class=button-div>
                 <button class="btn-add" id="button2" type="button" data-id="7">Add user</button>
                 <!-- <button class="btn-add" id="button" type="button" data-id="7">Add Engineer</button> -->
@@ -44,16 +44,16 @@
         <div class="form-group">
             Building Owner Address
             <br>
-            <input type="text" id="owner-add" name="address" value=0x00000000000000000000000000000000000000><br>
+            <input type="text" id="owner-add" name="address" value=0x395d3224962EDDEFfDd0f5DdFF3e1d6885b76058><br>
             Contractor Address
             <br>
-            <input type="text" id="contractor-add" name="address" value=0x00000000000000000000000000000000000000><br>
+            <input type="text" id="contractor-add" name="address" value=0xcEfdACf50a3a716c327810b7795050e83fa40625><br>
             Facility Manager Address
             <br>
-            <input type="text" id="FM-add" name="address" value=0x00000000000000000000000000000000000000><br>
+            <input type="text" id="FM-add" name="address" value=0x2B6f5A42d01117ce1540806D1d7d79386e8Da4d8><br>
             Siemens Building-ID
             <br>
-            <input type="text" id="Building-Id" name="address" value=""><br>
+            <input type="text" id="Building-Id" name="address" value=8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38><br>
             <!-- Siemens API Token
             <br>
             <input type="text" id="Token" name="address" value=0x00000000000000000000000000000000000000><br> -->
@@ -68,7 +68,7 @@
             <input type="text" id="Device4" name="address" value="Room Air Quality, In the required JSON format" style="padding: 15px 25px;"><br>
             Amount of deposit (will be deducted from Building Owner account, 80 Ether)
             <br>
-            <input type="text" id="depo-amount" name="address" value=e.g 20 Ether><br>
+            <input type="text" id="depo-amount" name="address" value=80><br>
             <!-- <form action="/action_page.php"> -->
                 <!-- <br>
                 <input type="file" id="myFile" name="filename"><br> -->
@@ -86,11 +86,11 @@
 
         </div>
         <div id="ftc-produce">
-            <h2>Status quo of your case</h2>
+            <h2>Status quo of your building</h2>
         <div class="form-group">
-            Case-Id
+            Building-Id
             <br>
-            <input type="text" id="case-check" name="address" value="e.g. 1"><br>
+            <input type="text" id="case-check" name="address" value=""><br>
             Starting time
             <br>
             <input type="text" id="check-start" name="address" value="e.g. Sun, 16 Feb 2020 14:20:47 GMT"><br>
@@ -98,7 +98,9 @@
             <br>
             <input type="text" id="check-end" name="address" value="e.g. Sun, 16 Feb 2020 14:20:47 GMT"><br>
             <div class=button-div>
-                <button class="btn-add" id="button3" type="button" data-id="5">Submit</button>
+                <button class="btn-add" id="button3" type="button" data-id="5">Facility manager</button>
+                <button class="btn-add" id="button4" type="button" data-id="4">Contractor</button>
+                <button class="btn-add" id="button6" type="button" data-id="1">Non</button>
             </div>
         </div>
     </div>
@@ -123,15 +125,15 @@
       <div id="ftc-produce">
             <h2>Make transaction</h2>
         <div class="form-group">
-            Case-Id
+            Building-Id
             <br>
-            <input type="text" id="case-check2" name="address" value="e.g. 1"><br>
+            <input type="text" id="case-check2" name="address" value=8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38><br>
             Contrator address
             <br>
-            <input type="text" id="receiver1" name="address" value="0x00000000000000000000000000000000000000"><br>
+            <input type="text" id="receiver1" name="address" value=0xcEfdACf50a3a716c327810b7795050e83fa40625><br>
             Facility Manager address
             <br>
-            <input type="text" id="receiver2" name="address" value="0x00000000000000000000000000000000000000"><br>
+            <input type="text" id="receiver2" name="address" value=0x2B6f5A42d01117ce1540806D1d7d79386e8Da4d8><br>
             <div class=button-div>
                 <button class="btn-add" id="button5" type="button" data-id="3">Execuet</button>
             </div>
