@@ -1,5 +1,5 @@
-var AddRole = artifacts.require("./AddRole.sol");
+var PerformanceCheck = artifacts.require("./PerformanceCheck.sol");
 
 module.exports = function(deployer) {
-  deployer.deploy(AddRole);
+  deployer.deploy(PerformanceCheck);
 };

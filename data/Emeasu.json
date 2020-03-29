@@ -1,0 +1,198 @@
+{
+  "links": {
+    "self": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/observations?filter[measuredBy]=afe571ee-9637-43a4-b918-32272b8c8f46&filter[timestamp][gte]=2020-03-17T09:34:02.027Z&filter[timestamp][lte]=2020-03-26T09:34:02.027Z",
+    "next": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/observations?filter[measuredBy]=afe571ee-9637-43a4-b918-32272b8c8f46&filter[timestamp][gte]=2020-03-17T09:34:02.027Z&filter[timestamp][lte]=2020-03-26T09:34:02.027Z&page[cursor]=eyJnIjp7ImwiOjEwMCwibyI6MH0sImUiOnsibCI6MTAwLCJvIjoxMDB9fQ=="
+  },
+  "data":[ 
+    {
+      "type": "observation",
+      "id": "49599855383049303232711957588951958840303985477682200578.0",
+      "attributes": {
+        "value": "44",
+        "timestamp": "2020-03-25T13:00:03.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711956492220499915010409482583801858.0",
+      "attributes": {
+        "value": "35",
+        "timestamp": "2020-03-25T12:45:03.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711955369560000010622266948387340290.0",
+      "attributes": {
+        "value": "42",
+        "timestamp": "2020-03-25T12:30:03.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711954317260191733625157011265028098.0",
+      "attributes": {
+        "value": "39",
+        "timestamp": "2020-03-25T12:15:03.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711953120985780821263014770860097538.0",
+      "attributes": {
+        "value": "40",
+        "timestamp": "2020-03-25T12:00:03.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711951939078244349201125780102316034.0",
+      "attributes": {
+        "value": "44",
+        "timestamp": "2020-03-25T11:45:04.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711950730002517932939675140014211074.0",
+      "attributes": {
+        "value": "48",
+        "timestamp": "2020-03-25T11:30:04.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711949493353611422907762351947120642.0",
+      "attributes": {
+        "value": "48",
+        "timestamp": "2020-03-25T11:15:04.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711948271615595972002685804706004994.0",
+      "attributes": {
+        "value": "38",
+        "timestamp": "2020-03-25T11:00:04.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    },
+    {
+      "type": "observation",
+      "id": "49599855383049303232711946948412436480841782624375537666.0",
+      "attributes": {
+        "value": "38",
+        "timestamp": "2020-03-25T10:45:04.000Z"
+      },
+      "relationships": {
+        "measuredBy": {
+          "links": {
+            "related": "https://api.buildingtwin.siemens.com/core/buildings/8a0c6f2a-c8b1-48dc-98a3-288e0fe20f38/datapoints/afe571ee-9637-43a4-b918-32272b8c8f46"
+          },
+          "data": {
+            "id": "afe571ee-9637-43a4-b918-32272b8c8f46",
+            "type": "datapoint"
+          }
+        }
+      }
+    }
+  ]
+}

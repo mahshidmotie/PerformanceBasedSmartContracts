@@ -1,11 +1,12 @@
 require('dotenv').config();
+const Edata = require('../data/Emeasu.json');
 const express = require('express');
 const httputil = require("./httputil");
 var TruffleContract = require('@truffle/contract');
 const app = express();
 app.use(express.static('client'));
 app.use(express.static('build/contracts'));
-const AddRoleABI = require('../build/contracts/AddRole.json').abi;
+const PerformanceCheckABI = require('../build/contracts/PerformanceCheck.json').abi;
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const Tx = require('ethereumjs-tx').Transaction;
 const Web3 = require('web3');
@@ -15,10 +16,10 @@ const provider = new HDWalletProvider(process.env.ORACLE_ACCOUNTMNEMONIC, networ
 const web3 = new Web3(provider);
 
 // Readig the contract
-const AddRoleArtifact = require('../build/contracts/AddRole.json');
-AddRole = TruffleContract(AddRoleArtifact);
-AddRole.setProvider(provider);
-contract = new web3.eth.Contract(AddRoleABI);
+const PerformanceCheckArtifact = require('../build/contracts/PerformanceCheck.json');
+PerformanceCheck = TruffleContract(PerformanceCheckArtifact);
+PerformanceCheck.setProvider(provider);
+contract = new web3.eth.Contract(PerformanceCheckABI);
 
 const PORT = process.env.PORT || 3000;
 var cors = require('cors');
@@ -51,15 +52,16 @@ function randcreat() {
 
 //decising whether a sensor of a building should be read
 async function decide (randomnumber){
-    const AddRoledep = await AddRole.deployed();
-    const caseCount = (await AddRoledep.caseCount()).toString();
+    const PerformanceCheckdep = await PerformanceCheck.deployed();
+    const caseCount = (await PerformanceCheckdep.caseCount()).toString();
     console.log("case count"  + caseCount);
-    if (randomnumber<caseCount*1200/(2*60*24)){
+    // if (randomnumber<=caseCount*0.15842014){
+        if (randomnumber<=caseCount*0.20572917){
         //console.log("select1:");
-        const select = Math.floor(randomnumber*(2*60*24)/1200)+1;
+        const select = Math.floor(randomnumber/0.20572917)+1;
         console.log(select);
-        const item = await AddRoledep.cases(select);
-        let bs = await AddRoledep.getarray(select);
+        const item = await PerformanceCheckdep.cases(select);
+        let bs = await PerformanceCheckdep.getarray(select);
         const buildingId = item[4];
         console.log("buildingId:",buildingId);
         // *** if you need to read 3 rooms of a building
@@ -94,7 +96,7 @@ async function decide (randomnumber){
         //     const obsval = Math.floor((body.data[0].attributes.value)*10);
         //     console.log("T set point value:",body.data[0].attributes.value);
     
-        //     let check = await AddRoledep.chekTid(select, web3.utils.asciiToHex(Tid) );
+        //     let check = await PerformanceCheckdep.chekTid(select, web3.utils.asciiToHex(Tid) );
         //     console.log("check:",check);
         //     if (check){
         //         var callres2 = await getObservationsByDatapointId(token, buildingId, Tid);
@@ -113,7 +115,7 @@ async function decide (randomnumber){
         
         //     console.log("Room T value:",obsval2);
     
-        //     let check2 = await AddRoledep.chekRHuid(select, web3.utils.asciiToHex(RHuid) );
+        //     let check2 = await PerformanceCheckdep.chekRHuid(select, web3.utils.asciiToHex(RHuid) );
         //     console.log("check2:",check2);
         //     if (check2){
         //         RHuid = RHuid.concat("'","SENDEV'HURELR");
@@ -133,7 +135,7 @@ async function decide (randomnumber){
         
         //     console.log("Relative Humidity value:",obsval3);
     
-        //     let check3 = await AddRoledep.chekAQuid(select, web3.utils.asciiToHex(AQuid) );
+        //     let check3 = await PerformanceCheckdep.chekAQuid(select, web3.utils.asciiToHex(AQuid) );
         //     console.log("check3:",check3);
         //     if (check3){
         //         var callres4 = await getObservationsByDatapointId(token, buildingId, AQuid);
@@ -189,7 +191,7 @@ async function decide (randomnumber){
         console.log("T set point value:",body.data[0].attributes.value);
         
         // Checking this temperature measurement sensor existst in the list of sensors
-        let check = await AddRoledep.chekTid(select, web3.utils.asciiToHex(Tid) );
+        let check = await PerformanceCheckdep.chekTid(select, web3.utils.asciiToHex(Tid) );
         console.log("check:",check);
         if (check){
             var callres2 = await getObservationsByDatapointId(token, buildingId, Tid);
@@ -208,7 +210,7 @@ async function decide (randomnumber){
     
         console.log("Room T value:",obsval2);
         // Checking if this relative humidity measurement sensor existst in the list of sensors
-        let check2 = await AddRoledep.chekRHuid(select, web3.utils.asciiToHex(RHuid) );
+        let check2 = await PerformanceCheckdep.chekRHuid(select, web3.utils.asciiToHex(RHuid) );
         console.log("check2:",check2);
         if (check2){
             RHuid = RHuid.concat("'","SENDEV'HURELR");
@@ -229,7 +231,7 @@ async function decide (randomnumber){
         console.log("Relative Humidity value:",obsval3);
 
         // Checking if this co2 measurement sensor existst in the list of sensors
-        let check3 = await AddRoledep.chekAQuid(select, web3.utils.asciiToHex(AQuid) );
+        let check3 = await PerformanceCheckdep.chekAQuid(select, web3.utils.asciiToHex(AQuid) );
         console.log("check3:",check3);
         if (check3){
             var callres4 = await getObservationsByDatapointId(token, buildingId, AQuid);
@@ -252,12 +254,12 @@ async function decide (randomnumber){
         measus[2]=obsval3;
         measus[3]=obsval4;
 
-        const contractowner = await AddRoledep.contractOwner();
+        const contractowner = await PerformanceCheckdep.contractOwner();
         console.log("devids:", devid);
         console.log("measurements:", measus);
 
 
-        AddRole.deployed().then(function(instance) {
+        PerformanceCheck.deployed().then(function(instance) {
             return instance.addValue(
                 devid,
                 measus,
@@ -271,6 +273,63 @@ async function decide (randomnumber){
             console.log(err.message);
         });
     }
+    if (randomnumber<=caseCount*0.20572917/35){
+        const contractowner = await PerformanceCheckdep.contractOwner();
+        const select = Math.floor(randomnumber/0.20572917*35)+1;
+        console.log(select);
+        const item = await PerformanceCheckdep.cases(select);
+        //let bs = await PerformanceCheckdep.getarray(select);
+        const buildingId = item[4];
+        console.log("buildingId:",buildingId);
+        let date_ob = new Date();
+
+        // current date
+        // adjust 0 before single digit date
+        let date = (("0" + date_ob.getDate()).slice(-2)).toString();
+
+        // current month
+        let month = (("0" + (date_ob.getMonth() + 1)).slice(-2)).toString();
+
+        // current year
+        let year = (date_ob.getFullYear()).toString();
+
+        // current hours
+        let hours = (("0" + date_ob.getUTCHours()).slice(-2)).toString() ;
+
+        // current minutes
+        let minutes =(("0" + date_ob.getUTCMinutes()).slice(-2)).toString() ;
+
+        // current seconds
+        let seconds =(("0" + date_ob.getUTCSeconds()).slice(-2)).toString() ;
+
+
+        // prints date & time in YYYY-MM-DD HH:MM:SS format
+        console.log(year + "-" + month + "-" + date + "T" + hours + ":" + minutes + ":" + seconds+".000Z");
+        var time = year.concat("-",month.concat("-",date.concat("T",hours.concat(":",minutes.concat(":",seconds.concat(".","000Z"))))));
+        console.log(time);
+
+        //$.getJSON(`./data/Emeasu.json`, function(json) {
+            // var jsf = Edata;
+            // var random3 = Math.floor((Math.random())*10);
+            // console.log(jsf); 
+            // var jsf2 = Math.floor(parseFloat (jsf["data"][random3]["attributes"]["value"]));
+            var jsf2 = Math.floor((Math.random)*20+35);
+            console.log("Measured electricity:" , jsf2);
+            PerformanceCheck.deployed().then(function(instance) {
+                return instance.addEValue(
+                    jsf2,
+                    buildingId,
+                    {from: contractowner}
+                );
+            }).then(function(result) {
+                // $("#ftc-item").text(result[tx]);
+                console.log('electricity added:',result);
+            }).catch(function(err) {
+                console.log(err.message);
+            });
+        //});
+    }
+
 
 }
 
@@ -279,7 +338,7 @@ app.get('/random', jsonParser, (req, res)=>{
     
     setInterval(() => {
         randcreat();
-    }, 90000);
+    }, 180000);
     
 });
 

@@ -43,7 +43,7 @@ App = {
 
         App.getMetaskAccountID();
 
-        return  await App.initContractAddRole();
+        return  await App.initContractPerformanceCheck();
     },
 
     // fetches field entries
@@ -167,23 +167,23 @@ App = {
 
 
 
-    initContractAddRole : async function (){
+    initContractPerformanceCheck : async function (){
 
-        await $.getJSON('AddRole.json',function(data){
-            var AddRoleArtifact = data;
-            App.contracts.AddRole = TruffleContract(AddRoleArtifact);
-            App.contracts.AddRole.setProvider(App.web3Provider);
-            console.log ("App.contracts.AddRole", App.contracts.AddRole);
+        await $.getJSON('PerformanceCheck.json',function(data){
+            var PerformanceCheckArtifact = data;
+            App.contracts.PerformanceCheck = TruffleContract(PerformanceCheckArtifact);
+            App.contracts.PerformanceCheck.setProvider(App.web3Provider);
+            console.log ("App.contracts.PerformanceCheck", App.contracts.PerformanceCheck);
 
         });
 
         App.fetchEvents();
-        App.AddRole = await App.contracts.AddRole.deployed();
-        console.log ("App.AddRole", App.AddRole);
+        App.PerformanceCheck = await App.contracts.PerformanceCheck.deployed();
+        console.log ("App.PerformanceCheck", App.PerformanceCheck);
 
-    const FMFCount = (await App.AddRole.FMFCount()).toString(10);
-    const COFCount = (await App.AddRole.COFCount()).toString(10);
-    const AllfineCount = (await App.AddRole.AllfineCount()).toString();
+    const FMFCount = (await App.PerformanceCheck.FMFCount()).toString(10);
+    const COFCount = (await App.PerformanceCheck.COFCount()).toString(10);
+    const AllfineCount = (await App.PerformanceCheck.AllfineCount()).toString();
     console.log("FMFCount:", FMFCount);
     console.log("COFCount:", COFCount);
     console.log("AllfineCount:", AllfineCount);
@@ -208,10 +208,10 @@ App = {
 
         App.getMetaskAccountID();
         App.val = jsf2;
-        const contractowner = await App.AddRole.contractOwner();
+        const contractowner = await App.PerformanceCheck.contractOwner();
 
 
-        App.contracts.AddRole.deployed().then(function(instance) {
+        App.contracts.PerformanceCheck.deployed().then(function(instance) {
             return instance.addValue(
                 select,
                 App.val,
@@ -284,7 +284,7 @@ App = {
             //"due time:", App.unixTimeStamp
         );
 
-        await App.contracts.AddRole.deployed().then(function(instance) {
+        await App.contracts.PerformanceCheck.deployed().then(function(instance) {
             return instance.makeTx(
                 App.casecheck2,
                 App.COreceiver,
@@ -294,20 +294,20 @@ App = {
         }).then( async function(result) {
             // $("#ftc-item").text(result[tx]);
             console.log('execute tx',result);
-            const paid = (await App.AddRole.amountCO()).toString(10);
+            const paid = (await App.PerformanceCheck.amountCO()).toString(10);
         console.log("amount paid CO:", paid);
-        const paid2 = (await App.AddRole.amountFM()).toString(10);
+        const paid2 = (await App.PerformanceCheck.amountFM()).toString(10);
         console.log("amount paid FM:", paid2);
-        const state = (await App.AddRole.state()).toString(10);
+        const state = (await App.PerformanceCheck.state()).toString(10);
         console.log("state:", state);
-        const stime = (await App.AddRole.stime()).toString(10);
+        const stime = (await App.PerformanceCheck.stime()).toString(10);
         console.log("stime:", stime);
-        const xtime = (await App.AddRole.xtime()).toString(10);
+        const xtime = (await App.PerformanceCheck.xtime()).toString(10);
         console.log("xtime:", xtime);
-        const txnu = await App.AddRole.TxCount();
-        const Txtime = ((await App.AddRole.Txs(txnu))[7]).toString(10);
+        const txnu = await App.PerformanceCheck.TxCount();
+        const Txtime = ((await App.PerformanceCheck.Txs(txnu))[7]).toString(10);
         console.log("Tx time", Txtime);
-        const boo = ((await App.AddRole.b())).toString(10);
+        const boo = ((await App.PerformanceCheck.b())).toString(10);
         console.log("boolean", boo);
         }).catch(function(err) {
             console.log(err.message);
@@ -315,20 +315,20 @@ App = {
 
         
         
-        const paid = (await App.AddRole.amountCO()).toString(10);
+        const paid = (await App.PerformanceCheck.amountCO()).toString(10);
         console.log("amount paid CO:", paid);
-        const paid2 = (await App.AddRole.amountFM()).toString(10);
+        const paid2 = (await App.PerformanceCheck.amountFM()).toString(10);
         console.log("amount paid FM:", paid2);
-        const state = (await App.AddRole.state()).toString(10);
+        const state = (await App.PerformanceCheck.state()).toString(10);
         console.log("state:", state);
-        const stime = (await App.AddRole.stime()).toString(10);
+        const stime = (await App.PerformanceCheck.stime()).toString(10);
         console.log("stime:", stime);
-        const xtime = (await App.AddRole.xtime()).toString(10);
+        const xtime = (await App.PerformanceCheck.xtime()).toString(10);
         console.log("xtime:", xtime);
-        const txnu = await App.AddRole.TxCount();
-        const Txtime = ((await App.AddRole.Txs(txnu))[7]).toString(10);
+        const txnu = await App.PerformanceCheck.TxCount();
+        const Txtime = ((await App.PerformanceCheck.Txs(txnu))[7]).toString(10);
         console.log("Tx time", Txtime);
-        const boo = ((await App.AddRole.b())).toString(10);
+        const boo = ((await App.PerformanceCheck.b())).toString(10);
         console.log("boolean", boo);
     },
 
@@ -346,7 +346,7 @@ App = {
         );
 
 
-        App.contracts.AddRole.deployed().then(function(instance) {
+        App.contracts.PerformanceCheck.deployed().then(function(instance) {
             return instance.statusQuoFM(
                 App.casecheck,
                 App.checkstart,
@@ -356,7 +356,7 @@ App = {
         }).then(async function(result) {
             // $("#ftc-item").text(result[tx]);
             console.log('casecheck:',result);
-                    var FMF = (await App.AddRole.FMFaults()).toNumber(10);
+                    var FMF = (await App.PerformanceCheck.FMFaults()).toNumber(10);
 
         console.log("For Case 1 the minus points for Facility Manager are: ",FMF, " .");
 
@@ -382,7 +382,7 @@ App = {
         );
 
 
-        App.contracts.AddRole.deployed().then(function(instance) {
+        App.contracts.PerformanceCheck.deployed().then(function(instance) {
             return instance.statusQuoCO(
                 App.casecheck,
                 App.checkstart,
@@ -393,7 +393,7 @@ App = {
             // $("#ftc-item").text(result[tx]);
             console.log('casecheck:',result);
 
-        const COF = (await App.AddRole.COFaults()).toString(10);
+        const COF = (await App.PerformanceCheck.COFaults()).toString(10);
 
         console.log("For Case 1 the minus points Contratcor are: ", COF," .");
 
@@ -421,7 +421,7 @@ App = {
         );
 
 
-        App.contracts.AddRole.deployed().then(function(instance) {
+        App.contracts.PerformanceCheck.deployed().then(function(instance) {
             return instance.statusQuoAll(
                 App.casecheck,
                 App.checkstart,
@@ -432,7 +432,7 @@ App = {
             // $("#ftc-item").text(result[tx]);
             console.log('casecheck:',result);
 
-        const NoF = (await App.AddRole.NoFault()).toString(10);
+        const NoF = (await App.PerformanceCheck.NoFault()).toString(10);
         console.log("For Case 1 the minus points non are:" , NoF, " .");
 
         var node = document.createElement("li");
@@ -459,9 +459,10 @@ App = {
             App.depoAmount2 = 20 * 1000000000000000000;
 
            }
+           App.Erate = parseInt($("#Erate").val());
 
 
-           App.contracts.AddRole.deployed().then(function(instance) {
+           App.contracts.PerformanceCheck.deployed().then(function(instance) {
             return instance.addDepo(
                 {from : App.OwnerAdd,
                 value : (App.depoAmount1)}
@@ -470,7 +471,7 @@ App = {
             // $("#ftc-item").text(result[tx]);
             console.log('addDepo1:',result);
 
-            App.contracts.AddRole.deployed().then(function(instance) {
+            App.contracts.PerformanceCheck.deployed().then(function(instance) {
                 return instance.addDepo2(
                     {from : App.OwnerAdd,
                     value : (App.depoAmount2)
@@ -480,7 +481,7 @@ App = {
                 // $("#ftc-item").text(result[tx]);
                 console.log('addDepo2:',result);
 
-                App.contracts.AddRole.deployed().then(function(instance) {
+                App.contracts.PerformanceCheck.deployed().then(function(instance) {
                     return instance.addCase(
                         App.OwnerAdd,
                         App.ContAdd,
@@ -491,6 +492,7 @@ App = {
                         App.RHudevices,
                         App.AQudevices,
                         App.amount,
+                        App.Erate,
                         {from: App.metamaskAccountID}
                     );
                 }).then(function(result) {
@@ -512,7 +514,7 @@ App = {
             console.log(err.message);
         });
         /////////////should we first add case or depo?/////////////////////////////////
-        // App.contracts.AddRole.deployed().then(function(instance) {
+        // App.contracts.PerformanceCheck.deployed().then(function(instance) {
         //     return instance.addCase(
         //         App.OwnerAdd,
         //         App.ContAdd,
@@ -526,7 +528,7 @@ App = {
         //     console.log('addOwner:',result);
         //     console.log('amount',App.depoAmount);
         //     //console.log('MetaID',App.metamaskAccountID);
-        //     App.contracts.AddRole.deployed().then(function(instance) {
+        //     App.contracts.PerformanceCheck.deployed().then(function(instance) {
         //         return instance.addDepo(
         //             {from : App.OwnerAdd,
         //             value : (App.depoAmount-20)}
@@ -538,7 +540,7 @@ App = {
         //         console.log(err.message);
         //     });
 
-        //     App.contracts.AddRole.deployed().then(function(instance) {
+        //     App.contracts.PerformanceCheck.deployed().then(function(instance) {
         //         return instance.addDepo2(
         //             {from : App.OwnerAdd
         //             }
@@ -556,7 +558,7 @@ App = {
 
             // console.log('amount',App.depoAmount);
             // //console.log('MetaID',App.metamaskAccountID);
-            // App.contracts.AddRole.deployed().then(function(instance) {
+            // App.contracts.PerformanceCheck.deployed().then(function(instance) {
             //     return instance.addDepo(
             //         {from : App.OwnerAdd,
             //         value : App.depoAmount}
@@ -586,7 +588,7 @@ App = {
 
         );
 
-        App.contracts.AddRole.deployed().then(function(instance) {
+        App.contracts.PerformanceCheck.deployed().then(function(instance) {
             return instance.boAdd(
                 App.UserAdd,
                 {from: App.metamaskAccountID}
@@ -603,16 +605,16 @@ App = {
 
 
     fetchEvents: function () {
-        if (typeof App.contracts.AddRole.currentProvider.sendAsync !== "function") {
-            App.contracts.AddRole.currentProvider.sendAsync = function () {
-                return App.contracts.AddRole.currentProvider.send.apply(
-                App.contracts.AddRole.currentProvider,
+        if (typeof App.contracts.PerformanceCheck.currentProvider.sendAsync !== "function") {
+            App.contracts.PerformanceCheck.currentProvider.sendAsync = function () {
+                return App.contracts.PerformanceCheck.currentProvider.send.apply(
+                App.contracts.PerformanceCheck.currentProvider,
                     arguments
               );
             };
         }
 
-        App.contracts.AddRole.deployed().then(function(instance) {
+        App.contracts.PerformanceCheck.deployed().then(function(instance) {
         var events = instance.allEvents(function(err, log){
           if (!err)
             $("#ftc-events").append('<li>' + log.event + ' - ' + log.transactionHash + '</li>');
@@ -640,14 +642,14 @@ App = {
     // decide: async function (randomnumber) {
     //     //var token =await gettoken();
     //     //console.log(token);
-    //     const caseCount = await App.AddRole.caseCount();
+    //     const caseCount = await App.PerformanceCheck.caseCount();
     //     //console.log(caseCount);
     //     if (randomnumber<caseCount*1200/(2*60*24)){
     //         //console.log("select1:");
     //         const select = Math.floor(randomnumber*(2*60*24)/1200)+1;
     //         console.log(select);
-    //         const item = await App.AddRole.cases(select);
-    //         let bs = await App.AddRole.getarray(select);
+    //         const item = await App.PerformanceCheck.cases(select);
+    //         let bs = await App.PerformanceCheck.getarray(select);
     //         const buildingId = item[3];
     //         console.log("buildingId:",buildingId);
     //         //console.log("structs:",item);
@@ -686,11 +688,11 @@ App = {
     //     console.log(
     //         "case-id:", App.casecheck,
     //     );
-    //     const CC = (await App.AddRole.compareCount()).toNumber(10);
-    //     const diffcount = (await App.AddRole.diffCount()).toNumber(10);
+    //     const CC = (await App.PerformanceCheck.compareCount()).toNumber(10);
+    //     const diffcount = (await App.PerformanceCheck.diffCount()).toNumber(10);
     //     for (i=1; i<(diffcount+1); i++)
     //     {
-    //         const diffadded = await App.AddRole.diffs(i);
+    //         const diffadded = await App.PerformanceCheck.diffs(i);
     //         const diff = diffadded[1].toNumber(10);
     //         const CId = diffadded[2].toNumber(10);
     //         const time = diffadded[3].toNumber(10);
