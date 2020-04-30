@@ -14,6 +14,9 @@ module.exports = {
         'process.env': {
             'LOCAL_NODE': JSON.stringify(process.env.LOCAL_NODE),
             'MODE':JSON.stringify(process.env.MODE),
+            'Infura_API_Key':JSON.stringify(process.env.Infura_API_Key),
+            'ORACLE_RinkebyACCOUNTMNEMONIC':JSON.stringify(process.env.ORACLE_RinkebyACCOUNTMNEMONIC),
+
         }
     })
   ],

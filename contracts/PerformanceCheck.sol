@@ -153,7 +153,7 @@ contract PerformanceCheck {
     require (isWhitelisted(account1),"building owner is not a user");
     //require (isWhitelisted(account2),"building owner is not a user");
     //require (isWhitelisted(account3),"building owner is not a user");
-    require (depoam == 80,"not enoug depo");
+    require (depoam == 11,"not enoug depo");
     caseCount ++;
     uint time = block.timestamp;
     cases[caseCount] = CaseItem(caseCount, account1, account2, account3, BI, TsetIDs, TIDs, RHuIDs, AQuIDs, time, Erate);
@@ -162,16 +162,16 @@ contract PerformanceCheck {
 
   //adding depo into contract account to be transfered later to the contractor and facility manager
   function addDepo() public payable {
-    require (msg.value == 60 ether,"not enoug depo");
+    require (msg.value == 11 ether,"not enoug depo");
     //ContractAdd.transfer(msg.value);
     //Receive(msg.value);
   }
 
   //adding depo to contract owner account for gas fee of the sensor measurements
-  function addDepo2() public payable {
-    require (msg.value == 20 ether,"not enoug depo");
-    contractOwner.transfer(20 ether);
-  }
+  // function addDepo2() public payable {
+  //   require (msg.value == 20 ether,"not enoug depo");
+  //   contractOwner.transfer(20 ether);
+  // }
 
   function getarray(uint _select) public view returns (bytes32[] memory devids) {
     return cases[_select].TsetIDs;
@@ -217,12 +217,12 @@ contract PerformanceCheck {
     //here we check diffrent measures
       if ( measures[0]>220)
       {
-        if(measures[1]>=205)
+        if(measures[1]>=200)
         {
           FMFCount ++;
           FMF[FMFCount] = FMFs(FMFCount, devid, time, buid);
         }
-        else if(measures[1]<205 && measures[1]!=0)
+        else if(measures[1]<200 && measures[1]!=0)
         {
           COFCount ++;
           COF[COFCount] = COFs(COFCount, devid, time, buid);
@@ -232,14 +232,14 @@ contract PerformanceCheck {
           Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
         }
       }
-      else if ( measures[0]<210 && measures[0]!=0)
+      else if ( measures[0]<200 && measures[0]!=0)
       {
-        if(((measures[1]>=185 && measures[1]<=245) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2]>=400 && measures[2]<=600) || measures[2]==10000 || measures[2]==0 ) && (measures[3] <= 1000 || measures[3] == 10000 || measures[3] == 0))
+        if(((measures[1]>=180 && measures[1]<=250) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2]>=200 && measures[2]<=600) || measures[2]==10000 || measures[2]==0 ) && (measures[3] <= 1000 || measures[3] == 10000 || measures[3] == 0))
         {
           AllfineCount ++;
           Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
         }
-        else if(measures[1]<185 )
+        else if(measures[1]<180 )
         {
           FMFCount ++;
           FMF[FMFCount] = FMFs(FMFCount, devid, time, buid);
@@ -250,9 +250,9 @@ contract PerformanceCheck {
           COF[COFCount] = COFs(COFCount, devid, time, buid);
         }
       }
-      else if ( measures[0]<=220 && measures[0]>=210)
+      else if ( measures[0]<=220 && measures[0]>=200)
       {
-        if(((measures[1]>=185 && measures[1]<=245) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2] >= 400 && measures[2]<= 600) || measures[2] == 10000 || measures[2] == 0 ) && (measures[3]<= 1000 || measures[3] == 10000 || measures[3] == 0))
+        if(((measures[1]>=180 && measures[1]<=255) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2] >= 200 && measures[2]<= 600) || measures[2] == 10000 || measures[2] == 0 ) && (measures[3]<= 1000 || measures[3] == 10000 || measures[3] == 0))
         {
           AllfineCount ++;
           Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
@@ -345,7 +345,7 @@ contract PerformanceCheck {
       }
 
     }
-    require ((time-xtime)>=300, "You should wait at least four minute after your previous transaction");
+    require ((time-xtime)>=43200, "You should wait at least four minute after your previous transaction");
     uint totdiff1 = 0;
     uint Esum = 0;
     uint EsumCount = 0;
@@ -353,32 +353,32 @@ contract PerformanceCheck {
     uint maxamount = 0;
     //uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
     uint sixmonthamount = (5)*1000000000000000000;
-    if ((time - stime) <= 1800){
+    if ((time - stime) <= 6*43200){
       state = 4;
-      if ((time-xtime) >= 300 && (time-xtime) < 600)
+      if ((time-xtime) >= 43200 && (time-xtime) < 2*43200)
       {
       maxamount = sixmonthamount * 1;
-      time = xtime + 300;
+      time = xtime + 43200;
       }
-      else if ((time-xtime) >= 600 && (time-xtime) < 900 )
+      else if ((time-xtime) >= 2*43200 && (time-xtime) < 3*43200 )
       {
       maxamount = sixmonthamount * 2;
-      time = xtime + 600;
+      time = xtime + 2*43200;
       }
-      else if ((time-xtime) >= 900 && (time-xtime) < 1200 )
+      else if ((time-xtime) >= 3*43200 && (time-xtime) < 4*43200 )
       {
       maxamount = sixmonthamount * 3;
-      time = xtime + 900;
+      time = xtime + 3*43200;
       }
-      else if ((time-xtime) >= 1200 && (time-xtime) < 1500 )
+      else if ((time-xtime) >= 4*43200 && (time-xtime) < 5*43200 )
       {
       maxamount = sixmonthamount * 4;
-      time = xtime + 1200;
+      time = xtime + 4*43200;
       }
-      else if ((time-xtime) >= 1500 && (time-xtime) < 1800)
+      else if ((time-xtime) >= 5*43200 && (time-xtime) < 6*43200)
       {
       maxamount = sixmonthamount * 5;
-      time = xtime + 1500;
+      time = xtime + 5*43200;
       }
       else {
       maxamount = 0;
@@ -390,19 +390,19 @@ contract PerformanceCheck {
       if (xtime == stime){
         maxamount = sixmonthamount * 6;
       }
-      else if ((xtime-stime) == 300){
+      else if ((xtime-stime) == 43200){
         maxamount = sixmonthamount * 5;
       }
-      else if ((xtime-stime) == 600){
+      else if ((xtime-stime) == 2*43200){
         maxamount = sixmonthamount * 4;
       }
-      else if ((xtime-stime) == 900){
+      else if ((xtime-stime) == 3*43200){
         maxamount = sixmonthamount * 3;
       }
-      else if ((xtime-stime) == 1200){
+      else if ((xtime-stime) == 4*43200){
         maxamount = sixmonthamount * 2;
       }
-      else if ((xtime-stime) == 1500){
+      else if ((xtime-stime) == 5*43200){
         maxamount = sixmonthamount * 1;
       }
       else{
@@ -410,7 +410,7 @@ contract PerformanceCheck {
         state = 7;
       }
 
-      time = stime+1800;
+      time = stime+6*43200;
       //cases.remove(Cid);
       for (uint i = Cid; i<(caseCount); i++)
       {

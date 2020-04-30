@@ -48,7 +48,7 @@ async function smartRequest(req, timeout) {
     data: req.data
   }
 
-  //console.log(axiosRequest);
+  console.log(axiosRequest);
   //if (process.env.LOG_REQUESTS) {
     console.log(`${axiosRequest.method} ${axiosRequest.url}`);
   //}

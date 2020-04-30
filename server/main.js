@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 const Edata = require('../data/Emeasu.json');
 const express = require('express');
 const httputil = require("./httputil");
@@ -10,9 +11,11 @@ const PerformanceCheckABI = require('../build/contracts/PerformanceCheck.json').
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 const Tx = require('ethereumjs-tx').Transaction;
 const Web3 = require('web3');
-
+var csvWriter = require('csv-write-stream');
 const networkURL = 'http://localhost:7545'; 
 const provider = new HDWalletProvider(process.env.ORACLE_ACCOUNTMNEMONIC, networkURL);
+//const networkURL = process.env.Infura_API_Key; 
+//const provider = new HDWalletProvider(process.env.ORACLE_RinkebyACCOUNTMNEMONIC, networkURL);
 const web3 = new Web3(provider);
 
 // Readig the contract
@@ -47,18 +50,37 @@ app.get('/', (req, res) => {
 function randcreat() {
     var randomnumber=Math.random();
     console.log(' ' + randomnumber);
+    // const PerformanceCheckdep = await PerformanceCheck.deployed();
+    // const caseCount = (await PerformanceCheckdep.caseCount()).toString();
+    //console.log("case count"  + caseCount);
     decide(randomnumber);
 };
+
+function getMetaskAccountID () {
+
+    
+     // Retrieving accounts
+     web3.eth.getAccounts(function(err, res) {
+         if (err) {
+             console.log('Error:',err);
+             return;
+         }
+         console.log('getMetaskID:',res);
+         metamaskAccountID = res[0];
+
+     })
+
+ };
 
 //decising whether a sensor of a building should be read
 async function decide (randomnumber){
     const PerformanceCheckdep = await PerformanceCheck.deployed();
     const caseCount = (await PerformanceCheckdep.caseCount()).toString();
     console.log("case count"  + caseCount);
-    // if (randomnumber<=caseCount*0.15842014){
+     //if (randomnumber<=caseCount*0.9){
         if (randomnumber<=caseCount*0.20572917){
         //console.log("select1:");
-        const select = Math.floor(randomnumber/0.20572917)+1;
+        const select = Math.floor(randomnumber/0.9)+1;
         console.log(select);
         const item = await PerformanceCheckdep.cases(select);
         let bs = await PerformanceCheckdep.getarray(select);
@@ -180,6 +202,7 @@ async function decide (randomnumber){
         console.log("RHuid:",RHuid);
         console.log("AQuid:",AQuid);
         var token = await gettoken();
+        console.log("token:" , token)
 
         var callres = await getObservationsByDatapointId(token, buildingId, devidstr);
         assert.equal(callres.status, 200);
@@ -254,9 +277,10 @@ async function decide (randomnumber){
         measus[2]=obsval3;
         measus[3]=obsval4;
 
-        const contractowner = await PerformanceCheckdep.contractOwner();
+        //const contractowner = await PerformanceCheckdep.contractOwner();
         console.log("devids:", devid);
         console.log("measurements:", measus);
+        getMetaskAccountID();
 
 
         PerformanceCheck.deployed().then(function(instance) {
@@ -264,7 +288,7 @@ async function decide (randomnumber){
                 devid,
                 measus,
                 buildingId,
-                {from: contractowner}
+                {from:metamaskAccountID}
             );
         }).then(function(result) {
             // $("#ftc-item").text(result[tx]);
@@ -272,10 +296,82 @@ async function decide (randomnumber){
         }).catch(function(err) {
             console.log(err.message);
         });
+
+        let date_ob = new Date();
+
+        // current date
+        // adjust 0 before single digit date
+        let date = (("0" + date_ob.getDate()).slice(-2)).toString();
+
+        // current month
+        let month = (("0" + (date_ob.getMonth() + 1)).slice(-2)).toString();
+
+        // current year
+        let year = (date_ob.getFullYear()).toString();
+
+        // current hours
+        let hours = (("0" + date_ob.getUTCHours()).slice(-2)).toString() ;
+
+        // current minutes
+        let minutes =(("0" + date_ob.getUTCMinutes()).slice(-2)).toString() ;
+
+        // current seconds
+        let seconds =(("0" + date_ob.getUTCSeconds()).slice(-2)).toString() ;
+
+
+        // prints date & time in YYYY-MM-DD HH:MM:SS format
+        //console.log(year + "-" + month + "-" + date + "T" + hours + ":" + minutes + ":" + seconds+".000Z");
+        var time = year.concat("-",month.concat("-",date.concat("T",hours.concat(":",minutes.concat(":",seconds.concat(".","000Z"))))));
+        console.log(time);
+
+        var writer = csvWriter({sendHeaders: false}); //Instantiate var
+        var csvFilename = "comfort.csv";
+
+        // If CSV file does not exist, create it and add the headers
+        if (!fs.existsSync(csvFilename)) {
+        writer = csvWriter({sendHeaders: false});
+        writer.pipe(fs.createWriteStream(csvFilename));
+        writer.write({
+            header1: 'SPT',
+            header2: 'RT',
+            header3: 'RHU',
+            header4: 'AQU',
+            header5: 'Time',
+            header6: 'Room'
+        });
+        writer.end();
+        } 
+
+        // Append some data to CSV the file    
+        writer = csvWriter({sendHeaders: false});
+        writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+        writer.write({
+        header1: obsval,
+        header2: obsval,
+        header3: obsval3,
+        header4: obsval4,
+        header5: time,
+        header6: room
+        });
+        writer.end();
+
+        // Append more data to CSV the file    
+        writer = csvWriter({sendHeaders: false});
+        writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+        writer.write({
+            header1: obsval,
+            header2: obsval,
+            header3: obsval3,
+            header4: obsval4,
+            header5: time,
+            header6: room
+        });
+        writer.end();
     }
     if (randomnumber<=caseCount*0.20572917/35){
-        const contractowner = await PerformanceCheckdep.contractOwner();
-        const select = Math.floor(randomnumber/0.20572917*35)+1;
+        //const contractowner = await PerformanceCheckdep.contractOwner();
+        getMetaskAccountID();
+        const select = (Math.floor(randomnumber*35/0.20572917))+1;
         console.log(select);
         const item = await PerformanceCheckdep.cases(select);
         //let bs = await PerformanceCheckdep.getarray(select);
@@ -313,13 +409,13 @@ async function decide (randomnumber){
             // var random3 = Math.floor((Math.random())*10);
             // console.log(jsf); 
             // var jsf2 = Math.floor(parseFloat (jsf["data"][random3]["attributes"]["value"]));
-            var jsf2 = Math.floor((Math.random)*20+35);
+            var jsf2 = (Math.floor((Math.random())*20))+35;
             console.log("Measured electricity:" , jsf2);
             PerformanceCheck.deployed().then(function(instance) {
                 return instance.addEValue(
                     jsf2,
                     buildingId,
-                    {from: contractowner}
+                    {from:metamaskAccountID}
                 );
             }).then(function(result) {
                 // $("#ftc-item").text(result[tx]);
@@ -327,18 +423,54 @@ async function decide (randomnumber){
             }).catch(function(err) {
                 console.log(err.message);
             });
+
+            var writer = csvWriter({sendHeaders: false}); //Instantiate var
+            var csvFilename = "consumedenergy.csv";
+    
+            // If CSV file does not exist, create it and add the headers
+            if (!fs.existsSync(csvFilename)) {
+            writer = csvWriter({sendHeaders: false});
+            writer.pipe(fs.createWriteStream(csvFilename));
+            writer.write({
+                header1: 'electricity',
+                header2: 'time',
+            });
+            writer.end();
+            } 
+    
+            // Append some data to CSV the file    
+            writer = csvWriter({sendHeaders: false});
+            writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+            writer.write({
+            header1: jsf2,
+            header2: time
+
+            });
+            writer.end();
+    
+            // Append more data to CSV the file    
+            writer = csvWriter({sendHeaders: false});
+            writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+            writer.write({
+                header1: jsf2,
+                header2: time
+            });
+            writer.end();
         //});
     }
+
 
 
 }
 
 
 app.get('/random', jsonParser, (req, res)=>{
+
     
     setInterval(() => {
         randcreat();
     }, 180000);
+    
     
 });
 
@@ -507,7 +639,53 @@ function getRequest(token, method, path, data) {
   };
   const REQUEST_TIMEOUT = 20000;
   async function getByFilter(token, buildingId, resource, filterKey, filterValue) {
-    let filter = `?filter[${filterKey}]=${filterValue}`;
+    let date_ob1 = new Date();
+    let date_ob = new Date(date_ob1 - 2937600000);
+    let date_ob2 = new Date(date_ob - 900000);
+
+    // current date
+    // adjust 0 before single digit date
+    let date = (("0" + date_ob.getDate()).slice(-2)).toString();
+
+    // current month
+    let month = (("0" + (date_ob.getMonth() + 1)).slice(-2)).toString();
+
+    // current year
+    let year = (date_ob.getFullYear()).toString();
+
+    // current hours
+    let hours = (("0" + date_ob.getUTCHours()).slice(-2)).toString() ;
+
+    // current minutes
+    let minutes =(("0" + date_ob.getUTCMinutes()).slice(-2)).toString() ;
+
+    // current seconds
+    let seconds =(("0" + date_ob.getUTCSeconds()).slice(-2)).toString() ;
+    let date2 = (("0" + date_ob2.getDate()).slice(-2)).toString();
+
+    // current month
+    let month2 = (("0" + (date_ob2.getMonth() + 1)).slice(-2)).toString();
+
+    // current year
+    let year2 = (date_ob2.getFullYear()).toString();
+
+    // current hours
+    let hours2 = (("0" + date_ob2.getUTCHours()).slice(-2)).toString() ;
+
+    // current minutes
+    let minutes2 =(("0" + date_ob2.getUTCMinutes()).slice(-2)).toString() ;
+
+    // current seconds
+    let seconds2 =(("0" + date_ob2.getUTCSeconds()).slice(-2)).toString() ;
+
+
+    // prints date & time in YYYY-MM-DD HH:MM:SS format
+    console.log(date_ob1);
+    var time = year.concat("-",month.concat("-",date.concat("T",hours.concat(":",minutes.concat(":",seconds.concat(".","000Z"))))));
+    var time2 = year2.concat("-",month2.concat("-",date2.concat("T",hours2.concat(":",minutes2.concat(":",seconds2.concat(".","000Z"))))));
+    console.log(time);
+    console.log(time2);
+    let filter = `?filter[${filterKey}]=${filterValue}&filter[timestamp][lt]=${time}&filter[timestamp][gt]=${time2}`;
     let path = `${getBasePath()}/${buildingId}/${resource}${filter}`;
     let req = getGetRequest(token, path);
     let res = await httputil.smartRequest(req, REQUEST_TIMEOUT);

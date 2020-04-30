@@ -38,6 +38,7 @@ App = {
     else {
         console.log("if 3");
         App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+        //App.web3Provider = new Web3.providers.HttpProvider(process.env.Infura_API_Key);
     }
         console.log(App.web3Provider);
 
@@ -455,7 +456,7 @@ App = {
         );
            App.amount = parseInt($("#depo-amount").val());
            if (App.amount == 80){
-            App.depoAmount1 = 60 * 1000000000000000000;
+            App.depoAmount1 = 11 * 1000000000000000000;
             App.depoAmount2 = 20 * 1000000000000000000;
 
            }
@@ -471,15 +472,15 @@ App = {
             // $("#ftc-item").text(result[tx]);
             console.log('addDepo1:',result);
 
-            App.contracts.PerformanceCheck.deployed().then(function(instance) {
-                return instance.addDepo2(
-                    {from : App.OwnerAdd,
-                    value : (App.depoAmount2)
-                    }
-                );
-            }).then(function(result) {
-                // $("#ftc-item").text(result[tx]);
-                console.log('addDepo2:',result);
+            // App.contracts.PerformanceCheck.deployed().then(function(instance) {
+            //     return instance.addDepo2(
+            //         {from : App.OwnerAdd,
+            //         value : (App.depoAmount2)
+            //         }
+            //     );
+            // }).then(function(result) {
+            //     // $("#ftc-item").text(result[tx]);
+            //     console.log('addDepo2:',result);
 
                 App.contracts.PerformanceCheck.deployed().then(function(instance) {
                     return instance.addCase(
@@ -491,7 +492,7 @@ App = {
                         App.Tdevices,
                         App.RHudevices,
                         App.AQudevices,
-                        App.amount,
+                        App.depoAmount1/1000000000000000000,
                         App.Erate,
                         {from: App.metamaskAccountID}
                     );
@@ -502,9 +503,9 @@ App = {
                     console.log(err.message);
                 });
 
-            }).catch(function(err) {
-                console.log(err.message);
-            });
+            // }).catch(function(err) {
+            //     console.log(err.message);
+            // });
 
 
 
