@@ -204,14 +204,26 @@ async function decide (randomnumber){
         var token = await gettoken();
         console.log("token:" , token)
 
-        var callres = await getObservationsByDatapointId(token, buildingId, devidstr);
-        assert.equal(callres.status, 200);
-        body = callres.data;
-        assert.equal(body.data.length, 1);
+        // var callres = await getObservationsByDatapointId(token, buildingId, devidstr);
+        // assert.equal(callres.status, 200);
+        // body = callres.data;
+        // assert.equal(body.data.length, 1);
 
-        assert.equal(body.data[0].type, "observation");
-        const obsval = Math.floor((body.data[0].attributes.value)*10);
-        console.log("T set point value:",body.data[0].attributes.value);
+        // assert.equal(body.data[0].type, "observation");
+        var obsval = 0;
+        var randomT=Math.random();
+        if (randomT < 0.3)
+        {
+            obsval = 221;
+        }
+        else if(randomT > 0.9){
+            obsval = 199;
+        }
+        else{
+            obsval = 210;
+        }
+        //const obsval = Math.floor((body.data[0].attributes.value)*10);
+        console.log("T set point value:", obsval);
         
         // Checking this temperature measurement sensor existst in the list of sensors
         let check = await PerformanceCheckdep.chekTid(select, web3.utils.asciiToHex(Tid) );
@@ -293,80 +305,126 @@ async function decide (randomnumber){
         }).then(function(result) {
             // $("#ftc-item").text(result[tx]);
             console.log('Temperature added',result);
+
+            var FMFCount = 0;
+            var COFCount = 0;
+            var AllfineCount = 0;
+    
+            if ( obsval>220)
+            {
+              if(obsval2>=200)
+              {
+                FMFCount = 1;
+              }
+              else if(obsval2<200 && !(obsval2==0))
+              {
+                COFCount = 1;
+              }
+              else{
+                AllfineCount = 1;
+              }
+              
+            }
+            else if ( obsval<200 && !(obsval=00))
+            {
+              if(((obsval2>=180 && obsval2<=250) || obsval2 == 10000 || obsval2 == 0 ) && ((obsval3>=200 && obsval3<=600) || obsval3==10000 || obsval3==0 ) && (obsval4 <= 1000 || obsval4 == 10000 || obsval4 == 0))
+              {
+                AllfineCount = 1;
+              }
+              else if(obsval2<180 )
+              {
+                FMFCount = 1;
+              }
+              else
+              {
+                COFCount = 1;
+              }
+            }
+            else if ( obsval<=220 && obsval>=200)
+            {
+              if(((obsval2>=180 && obsval2<=250) || obsval2 == 10000 || obsval2 == 0 ) && ((obsval3>=200 && obsval3<=600) || obsval3==10000 || obsval3==0 ) && (obsval4 <= 1000 || obsval4 == 10000 || obsval4 == 0))
+              {
+                AllfineCount = 1;
+              }
+              else
+              {
+                COFCount = 1;
+              }
+            }
+            else{
+              AllfineCount = 1;
+            }
+    
+            let date_ob = new Date();
+    
+            // current date
+            // adjust 0 before single digit date
+            let date = (("0" + date_ob.getDate()).slice(-2)).toString();
+    
+            // current month
+            let month = (("0" + (date_ob.getMonth() + 1)).slice(-2)).toString();
+    
+            // current year
+            let year = (date_ob.getFullYear()).toString();
+    
+            // current hours
+            let hours = (("0" + date_ob.getUTCHours()).slice(-2)).toString() ;
+    
+            // current minutes
+            let minutes =(("0" + date_ob.getUTCMinutes()).slice(-2)).toString() ;
+    
+            // current seconds
+            let seconds =(("0" + date_ob.getUTCSeconds()).slice(-2)).toString() ;
+    
+    
+            // prints date & time in YYYY-MM-DD HH:MM:SS format
+            //console.log(year + "-" + month + "-" + date + "T" + hours + ":" + minutes + ":" + seconds+".000Z");
+            var time = year.concat("-",month.concat("-",date.concat("T",hours.concat(":",minutes.concat(":",seconds.concat(".","000Z"))))));
+            console.log(time);
+    
+            var writer = csvWriter({sendHeaders: false}); //Instantiate var
+            var csvFilename = "comfort.csv";
+    
+            // If CSV file does not exist, create it and add the headers
+            if (!fs.existsSync(csvFilename)) {
+            writer = csvWriter({sendHeaders: false});
+            writer.pipe(fs.createWriteStream(csvFilename));
+            writer.write({
+                header1: 'SPT',
+                header2: 'RT',
+                header3: 'RHU',
+                header4: 'AQU',
+                header5: 'Time',
+                header6: 'Room',
+                header7: 'FMF',
+                header8: 'COF',
+                header9: 'Allfine'
+    
+            });
+            writer.end();
+            } 
+    
+            // Append some data to CSV the file    
+            writer = csvWriter({sendHeaders: false});
+            writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
+            writer.write({
+            header1: obsval,
+            header2: obsval2,
+            header3: obsval3,
+            header4: obsval4,
+            header5: time,
+            header6: room,
+            header7: FMFCount,
+            header8: COFCount,
+            header9: AllfineCount
+            });
+            writer.end();
+
         }).catch(function(err) {
             console.log(err.message);
         });
 
-        let date_ob = new Date();
 
-        // current date
-        // adjust 0 before single digit date
-        let date = (("0" + date_ob.getDate()).slice(-2)).toString();
-
-        // current month
-        let month = (("0" + (date_ob.getMonth() + 1)).slice(-2)).toString();
-
-        // current year
-        let year = (date_ob.getFullYear()).toString();
-
-        // current hours
-        let hours = (("0" + date_ob.getUTCHours()).slice(-2)).toString() ;
-
-        // current minutes
-        let minutes =(("0" + date_ob.getUTCMinutes()).slice(-2)).toString() ;
-
-        // current seconds
-        let seconds =(("0" + date_ob.getUTCSeconds()).slice(-2)).toString() ;
-
-
-        // prints date & time in YYYY-MM-DD HH:MM:SS format
-        //console.log(year + "-" + month + "-" + date + "T" + hours + ":" + minutes + ":" + seconds+".000Z");
-        var time = year.concat("-",month.concat("-",date.concat("T",hours.concat(":",minutes.concat(":",seconds.concat(".","000Z"))))));
-        console.log(time);
-
-        var writer = csvWriter({sendHeaders: false}); //Instantiate var
-        var csvFilename = "comfort.csv";
-
-        // If CSV file does not exist, create it and add the headers
-        if (!fs.existsSync(csvFilename)) {
-        writer = csvWriter({sendHeaders: false});
-        writer.pipe(fs.createWriteStream(csvFilename));
-        writer.write({
-            header1: 'SPT',
-            header2: 'RT',
-            header3: 'RHU',
-            header4: 'AQU',
-            header5: 'Time',
-            header6: 'Room'
-        });
-        writer.end();
-        } 
-
-        // Append some data to CSV the file    
-        writer = csvWriter({sendHeaders: false});
-        writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
-        writer.write({
-        header1: obsval,
-        header2: obsval,
-        header3: obsval3,
-        header4: obsval4,
-        header5: time,
-        header6: room
-        });
-        writer.end();
-
-        // Append more data to CSV the file    
-        writer = csvWriter({sendHeaders: false});
-        writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
-        writer.write({
-            header1: obsval,
-            header2: obsval,
-            header3: obsval3,
-            header4: obsval4,
-            header5: time,
-            header6: room
-        });
-        writer.end();
     }
     if (randomnumber<=caseCount*0.20572917/35){
         //const contractowner = await PerformanceCheckdep.contractOwner();
@@ -420,10 +478,8 @@ async function decide (randomnumber){
             }).then(function(result) {
                 // $("#ftc-item").text(result[tx]);
                 console.log('electricity added:',result);
-            }).catch(function(err) {
-                console.log(err.message);
-            });
 
+                
             var writer = csvWriter({sendHeaders: false}); //Instantiate var
             var csvFilename = "consumedenergy.csv";
     
@@ -447,15 +503,13 @@ async function decide (randomnumber){
 
             });
             writer.end();
-    
-            // Append more data to CSV the file    
-            writer = csvWriter({sendHeaders: false});
-            writer.pipe(fs.createWriteStream(csvFilename, {flags: 'a'}));
-            writer.write({
-                header1: jsf2,
-                header2: time
+
+            }).catch(function(err) {
+                console.log(err.message);
             });
-            writer.end();
+
+    
+
         //});
     }
 

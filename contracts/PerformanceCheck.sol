@@ -452,26 +452,26 @@ contract PerformanceCheck {
 
     if (EsumCount>0){
       if ((Esum*100/(EsumCount*Erate))>150){
-      if ((maxamount/sixmonthamount*250)>totdiff1 && (maxamount/sixmonthamount*150)<totdiff1 ){
-        totdiff2 += 200;
+      if ((maxamount/sixmonthamount*250)>totdiff2 && (maxamount/sixmonthamount*150)<totdiff2 ){
+        totdiff1 += 200;
       }
-      else if ((maxamount/sixmonthamount*150)>=totdiff1 && (maxamount/sixmonthamount*50)<totdiff1 ){
-        totdiff2 += 350;
+      else if ((maxamount/sixmonthamount*150)>=totdiff2 && (maxamount/sixmonthamount*50)<totdiff2 ){
+        totdiff1 += 350;
       }
       else {
-        totdiff2 += 500;
+        totdiff1 += 500;
       }
     }
 
     else if ((Esum*100/(EsumCount*Erate))<=150 && (Esum*100/(EsumCount*Erate))>120){
-      if ((maxamount/sixmonthamount*250)>totdiff1 && (maxamount/sixmonthamount*150)<totdiff1 ){
-        totdiff2 += 100;
+      if ((maxamount/sixmonthamount*250)>totdiff2 && (maxamount/sixmonthamount*150)<totdiff2 ){
+        totdiff1 += 100;
       }
-      if ((maxamount/sixmonthamount*150)>=totdiff1 && (maxamount/sixmonthamount*50)<totdiff1 ){
-        totdiff2 += 200;
+      if ((maxamount/sixmonthamount*150)>=totdiff2 && (maxamount/sixmonthamount*50)<totdiff2 ){
+        totdiff1 += 200;
       }
-      if ((maxamount/sixmonthamount*50)>=totdiff1){
-        totdiff2 += 300;
+      if ((maxamount/sixmonthamount*50)>=totdiff2){
+        totdiff1 += 300;
       }
     }
     }
