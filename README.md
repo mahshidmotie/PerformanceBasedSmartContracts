@@ -6,7 +6,7 @@ Truffle migrate
 Truffle migrate --network rinkeby
 
 ## Running the app:
-npm run start
+npm run dev
 
 ## .env file
 PORT=3000
