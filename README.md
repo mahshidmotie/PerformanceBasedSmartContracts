@@ -27,13 +27,14 @@ BASE_PATH="/core/buildings"
 
 API_DOMAIN="api.buildingtwin.siemens.com"
 
-ORACLE_ACCOUNTMNEMONIC= "away swamp energy waste direct bounce govern firm salt order defense butter"
+ORACLE_ACCOUNTMNEMONIC= 
 
-ORACLE_ACCOUNTPRIVATE_KEY= "bdde559229c9e489903775d4b149218ea385d3ebf6f15f04289fbff5b5b2f7d5"
+ORACLE_ACCOUNTPRIVATE_KEY=
 
-Infura_API_Key="https://rinkeby.infura.io/v3/de54c59b0925406b9c541a1f2f3fda84"
+Infura_API_Key=
 
-ORACLE_RinkebyACCOUNTMNEMONIC= "away swamp energy waste direct bounce govern firm salt order defense butter"
+ORACLE_RinkebyACCOUNTMNEMONIC=
+
 
 FORCE_PROXY=1
 
