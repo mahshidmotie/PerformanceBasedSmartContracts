@@ -63,20 +63,12 @@ App = {
         var ar = new Array;
         var ar32 = new Array;
         for (i=0; i<length; i++)
-        { //////////in case for readinf dlt ids
-            // var splittedid = (Device.data[i].id).split("-")
-            // ar[i]= splittedid[0];
-            // ar[i+length]= splittedid[1];
-            // ar[i+length+length]= splittedid[2];
-            // ar[i+length+length+length]= splittedid[3];
-            // ar[i+length+length+length+length]= splittedid[4];
+        {
             ar[i]= Device.data[i].attributes.source.id;
         }
 
         for (i=0; i<length; i++)
-        {//////////in case for readinf dlt ids
-            // ar32[i]= web3.utils.asciiToHex((ar[i]).concat("-",(ar[i+length]).concat("-",(ar[i+length+length]))));
-            // ar32[i+length]= web3.utils.asciiToHex((ar[i+length+length+length]).concat("-",(ar[i+length+length+length+length])));
+        {
             ar32[i]= web3.utils.asciiToHex((ar[i]));
 
         }
@@ -233,15 +225,15 @@ App = {
 
 
     handleButtonClick: async function(event) {
-        //console.log("click kard2");
+        
         event.preventDefault();
 
         App.getMetaskAccountID();
-        //Update values with field-entries before calling functions
+      
         App.readForm();
 
         var processId = parseInt($(event.target).data('id'));
-        //console.log('processId',processId);
+        
 
         switch(processId) {
             case 1:
@@ -272,17 +264,12 @@ App = {
 
     makeTx: async function (event) {
         App.getMetaskAccountID();
-        //console.log("Tx khast");
         App.casecheck2 = $("#case-check2").val();
         App.COreceiver = $("#receiver1").val();
         App.FMreceiver = $("#receiver2").val();
-        // App.unixTimeStamp = (Math.floor(date.getTime() / 1000));
-        //App.unixTimeStamp = Date.parse($("#date").val());
         event.preventDefault();
-        //var processId = parseInt($(event.target).data('id'));
         console.log(
             "Tx case-id:", App.casecheck2,
-            //"due time:", App.unixTimeStamp
         );
 
         await App.contracts.PerformanceCheck.deployed().then(function(instance) {
@@ -472,16 +459,6 @@ App = {
             // $("#ftc-item").text(result[tx]);
             console.log('addDepo1:',result);
 
-            // App.contracts.PerformanceCheck.deployed().then(function(instance) {
-            //     return instance.addDepo2(
-            //         {from : App.OwnerAdd,
-            //         value : (App.depoAmount2)
-            //         }
-            //     );
-            // }).then(function(result) {
-            //     // $("#ftc-item").text(result[tx]);
-            //     console.log('addDepo2:',result);
-
                 App.contracts.PerformanceCheck.deployed().then(function(instance) {
                     return instance.addCase(
                         App.OwnerAdd,
@@ -503,86 +480,23 @@ App = {
                     console.log(err.message);
                 });
 
-            // }).catch(function(err) {
-            //     console.log(err.message);
-            // });
-
-
 
 
 
         }).catch(function(err) {
             console.log(err.message);
         });
-        /////////////should we first add case or depo?/////////////////////////////////
-        // App.contracts.PerformanceCheck.deployed().then(function(instance) {
-        //     return instance.addCase(
-        //         App.OwnerAdd,
-        //         App.ContAdd,
-        //         App.buildingId,
-        //         App.devices,
-        //         App.amount,
-        //         {from: App.metamaskAccountID}
-        //     );
-        // }).then(function(result) {
-        //     // $("#ftc-item").text(result[tx]);
-        //     console.log('addOwner:',result);
-        //     console.log('amount',App.depoAmount);
-        //     //console.log('MetaID',App.metamaskAccountID);
-        //     App.contracts.PerformanceCheck.deployed().then(function(instance) {
-        //         return instance.addDepo(
-        //             {from : App.OwnerAdd,
-        //             value : (App.depoAmount-20)}
-        //         );
-        //     }).then(function(result) {
-        //         // $("#ftc-item").text(result[tx]);
-        //         console.log('addDepo1:',result);
-        //     }).catch(function(err) {
-        //         console.log(err.message);
-        //     });
-
-        //     App.contracts.PerformanceCheck.deployed().then(function(instance) {
-        //         return instance.addDepo2(
-        //             {from : App.OwnerAdd
-        //             }
-        //         );
-        //     }).then(function(result) {
-        //         // $("#ftc-item").text(result[tx]);
-        //         console.log('addDepo2:',result);
-        //     }).catch(function(err) {
-        //         console.log(err.message);
-        //     });
-
-        // }).catch(function(err) {
-        //     console.log(err.message);
-        // });
-
-            // console.log('amount',App.depoAmount);
-            // //console.log('MetaID',App.metamaskAccountID);
-            // App.contracts.PerformanceCheck.deployed().then(function(instance) {
-            //     return instance.addDepo(
-            //         {from : App.OwnerAdd,
-            //         value : App.depoAmount}
-            //     );
-            // }).then(function(result) {
-            //     // $("#ftc-item").text(result[tx]);
-            //     console.log('addDepo:',result);
-            // }).catch(function(err) {
-            //     console.log(err.message);
-            // });
-
 
     },
 
     adduser: function (event) {
-        //console.log("click kard1");
         event.preventDefault();
 
         App.getMetaskAccountID();
-        //Update values with field-entries before calling functions
+        
         App.UserAdd = $("#user-add").val();
         event.preventDefault();
-        //var processId = parseInt($(event.target).data('id'));
+        
         console.log(
             "User address:", App.UserAdd,
 
@@ -595,7 +509,6 @@ App = {
                 {from: App.metamaskAccountID}
             );
         }).then(function(result) {
-            // $("#ftc-item").text(result[tx]);
             console.log('addUser:',result);
         }).catch(function(err) {
             console.log(err.message);
@@ -631,87 +544,6 @@ App = {
         //App.loadMessage();
     }
 
-    /////not inuse, was in use when rand was in front end ***********************************
-
-    // randcreat: function() {
-    //     var randomnumber=Math.random();
-    //     console.log(' ' + randomnumber);
-    //     App.decide(randomnumber);
-
-    // },
-
-    // decide: async function (randomnumber) {
-    //     //var token =await gettoken();
-    //     //console.log(token);
-    //     const caseCount = await App.PerformanceCheck.caseCount();
-    //     //console.log(caseCount);
-    //     if (randomnumber<caseCount*1200/(2*60*24)){
-    //         //console.log("select1:");
-    //         const select = Math.floor(randomnumber*(2*60*24)/1200)+1;
-    //         console.log(select);
-    //         const item = await App.PerformanceCheck.cases(select);
-    //         let bs = await App.PerformanceCheck.getarray(select);
-    //         const buildingId = item[3];
-    //         console.log("buildingId:",buildingId);
-    //         //console.log("structs:",item);
-    //         //const devlength = item[4].length;
-    //         //console.log("devices:",bs);
-    //         var randomnumber2=(Math.random())*bs.length;
-    //         const select2 = Math.floor(randomnumber2);
-    //         //console.log("select2",select2);
-    //         var devid = bs[select2];
-    //         //console.log("devid:",devid);
-    //         var devidstr = web3.utils.hexToUtf8(devid);
-    //         console.log("device id:",devidstr);
-
-    //         let iddata = {
-    //             "device_id": devidstr,
-    //             "building_id": buildingId
-    //         };
-
-    //         var jsf = await httpRequest("post", 'http://localhost:3000/id', JSON.stringify(iddata));
-    //         console.log(jsf); // this will show the info it in firebug console
-    //         var jsf2 = Math.floor(jsf.body);
-    //         console.log("Measured Temperature:" , jsf2);
-    //         App.addval(select, jsf2);
-    //         //App.readmeasured(select, select2);
-    //     }
-    // },
-
-//****************************************************************************** */
-///***************************************not in use
-    // getCompList: async function (event) {
-    //     //App.getMetaskAccountID();
-    //     //console.log("list khast");
-    //     App.casecheck = parseInt($("#case-check").val());
-    //     event.preventDefault();
-    //     //var processId = parseInt($(event.target).data('id'));
-    //     console.log(
-    //         "case-id:", App.casecheck,
-    //     );
-    //     const CC = (await App.PerformanceCheck.compareCount()).toNumber(10);
-    //     const diffcount = (await App.PerformanceCheck.diffCount()).toNumber(10);
-    //     for (i=1; i<(diffcount+1); i++)
-    //     {
-    //         const diffadded = await App.PerformanceCheck.diffs(i);
-    //         const diff = diffadded[1].toNumber(10);
-    //         const CId = diffadded[2].toNumber(10);
-    //         const time = diffadded[3].toNumber(10);
-    //         dateObj = new Date(time * 1000);
-    //         utcString = dateObj.toUTCString();
-    //         if (CId == App.casecheck)
-    //         {
-    //             var node = document.createElement("li");
-    //             var textnode = document.createTextNode("CaseId:" + CId + "  start time:"+ utcString + "  Tem.Diff:" + diff);
-    //             node.appendChild(textnode);
-    //             document.getElementById("myList").appendChild(node);
-    //         }
-
-    //     }
-
-    // },
-    //************************************************************************** */
-
 
 };
 
@@ -726,81 +558,4 @@ $(function() {
   });
 
 
-  // not in use, was in use when we had random in front end *************************************
-  function httpRequest(method, url, body = null) {
-    if (!['get', 'post', 'head'].includes(method)) {
-        throw new Error(`Invalid method: ${method}`);
-    }
-
-    let urlObject;
-
-    try {
-        urlObject = new URL(url);
-    } catch (error) {
-        throw new Error(`Invalid url ${url}`);
-    }
-
-    if (body && method !== 'post') {
-        throw new Error(`Invalid use of the body parameter while using the ${method.toUpperCase()} method.`);
-    }
-
-    let options = {
-        method: method.toUpperCase(),
-        hostname: urlObject.hostname,
-        port: urlObject.port,
-        path: urlObject.pathname,
-        headers : {"Content-Type": "application/json"}
-    };
-
-    if (body) {
-        options.headers['Content-Length'] = Buffer.byteLength(body);
-    }
-
-    return new Promise((resolve, reject) => {
-
-        const clientRequest = http.request(options, incomingMessage => {
-
-            // Response object.
-            let response = {
-                statusCode: incomingMessage.statusCode,
-                headers: incomingMessage.headers,
-                body: []
-            };
-
-            // Collect response body data.
-            incomingMessage.on('data', chunk => {
-                response.body.push(chunk);
-            });
-
-            // Resolve on end.
-            incomingMessage.on('end', () => {
-                if (response.body.length) {
-
-                    response.body = response.body.join();
-
-                    try {
-                        response.body = JSON.parse(response.body);
-                    } catch (error) {
-                        // Silently fail if response is not JSON.
-                    }
-                }
-
-                resolve(response);
-            });
-        });
-
-        // Reject on request error.
-        clientRequest.on('error', error => {
-            reject(error);
-        });
-
-        // Write request body if present.
-        if (body) {
-            clientRequest.write(body);
-        }
-
-        // Close HTTP connection.
-        clientRequest.end();
-    });
-};
-//******************************************************************************* */
+ 

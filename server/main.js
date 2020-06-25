@@ -113,12 +113,6 @@ async function decide (randomnumber){
         var token = await gettoken();
         console.log("token:" , token)
 
-        // var callres = await getObservationsByDatapointId(token, buildingId, devidstr);
-        // assert.equal(callres.status, 200);
-        // body = callres.data;
-        // assert.equal(body.data.length, 1);
-
-        // assert.equal(body.data[0].type, "observation");
         var obsval = 0;
         
         if (room == "RS_1OG_02_01" ||room == "RS_1OG_02_02" || room == "RS_1OG_05_03" )
@@ -195,7 +189,6 @@ async function decide (randomnumber){
         measus[2]=obsval3;
         measus[3]=obsval4;
 
-        //const contractowner = await PerformanceCheckdep.contractOwner();
         console.log("devids:", devid);
         console.log("measurements:", measus);
         getMetaskAccountID();
@@ -209,7 +202,6 @@ async function decide (randomnumber){
                 {from:metamaskAccountID}
             );
         }).then(function(result) {
-            // $("#ftc-item").text(result[tx]);
             console.log('Temperature added',result);
 
             var FMFCount = 0;
@@ -368,12 +360,7 @@ async function decide (randomnumber){
         var time = year.concat("-",month.concat("-",date.concat("T",hours.concat(":",minutes.concat(":",seconds.concat(".","000Z"))))));
         console.log(time);
 
-        //$.getJSON(`./data/Emeasu.json`, function(json) {
-            // var jsf = Edata;
-            // var random3 = Math.floor((Math.random())*10);
-            // console.log(jsf); 
-            // var jsf2 = Math.floor(parseFloat (jsf["data"][random3]["attributes"]["value"]));
-            var jsf2 = (Math.floor((Math.random())*20))+35;
+            var jsf2 = (Math.floor((Math.random())*20))+35; 
             console.log("Measured electricity:" , jsf2);
             PerformanceCheck.deployed().then(function(instance) {
                 return instance.addEValue(
@@ -382,7 +369,7 @@ async function decide (randomnumber){
                     {from:metamaskAccountID}
                 );
             }).then(function(result) {
-                // $("#ftc-item").text(result[tx]);
+
                 console.log('electricity added:',result);
 
                 
@@ -423,23 +410,6 @@ async function decide (randomnumber){
 
 }
 
-// async function readmeasurmenet(){
-//     const PerformanceCheckdep = await PerformanceCheck.deployed();
-//     const num = (await PerformanceCheckdep.measurmentCount()).toString();
-//     console.log("case count"  + num);
-//     //const num = await PerformanceCheckdep.measurmentCount();
-//     for (var a=1; a<num+1; a++){
-//         var valuesSt = await PerformanceCheckdep.values(a);
-//         //let bs = await PerformanceCheckdep.getarray2(a);
-//         var deviceid1 = valuesSt[1];
-//         var deviceid = web3.utils.hexToUtf8(deviceid1);
-//         var values = (valuesSt[3]).toString();
-//         console.log(deviceid);
-//         console.log(values);
-//         //console.log(values);
-//     }
-// }
-
 app.get('/random', jsonParser, (req, res)=>{
 
     
@@ -451,26 +421,6 @@ app.get('/random', jsonParser, (req, res)=>{
     
 });
 
-// ******this function was for the time that we had random in the front end, its useless now
-// app.post('/id', jsonParser, async (req, res)=>{
-//    var deid= req.body.device_id;
-//    var buiid= req.body.building_id;
-//    //console.log(`${deid}`);
-//    console.log(deid);
-//    let deid2 = deid;
-//    //res.send(deid);
-//    var token = await gettoken();
-//    console.log(token);
-//    //var callres = await getObservationsByDatapointId(token, buiid, "B_01'EG'RS_EG_01_01'SENDEV'TR");
-//    var callres = await getObservationsByDatapointId(token, buiid, deid);
-//    assert.equal(callres.status, 200);
-//    body = callres.data;
-//     assert.equal(body.data.length, 1);
-
-//     assert.equal(body.data[0].type, "observation");
-//     console.log("value:",body.data[0].attributes.value);
-//     res.send (body.data[0].attributes.value);
-// }); **********************
 
 
 const server = http.createServer(app);
