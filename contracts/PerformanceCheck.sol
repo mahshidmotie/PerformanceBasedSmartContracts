@@ -148,11 +148,10 @@ contract PerformanceCheck {
     }
 
   //adding a building and its information to the list to get checked
-  function addCase(address account1, address payable account2, address payable account3, string memory BI, bytes32[] memory TsetIDs,
-   bytes32[] memory TIDs, bytes32[] memory RHuIDs, bytes32[] memory AQuIDs, uint depoam, uint Erate) public {
+  function addCase(address account1, address payable account2, address payable account3, 
+                  string memory BI, bytes32[] memory TsetIDs, bytes32[] memory TIDs, 
+                  bytes32[] memory RHuIDs, bytes32[] memory AQuIDs, uint depoam, uint Erate) public {
     require (isWhitelisted(account1),"building owner is not a user");
-    //require (isWhitelisted(account2),"building owner is not a user");
-    //require (isWhitelisted(account3),"building owner is not a user");
     require (depoam == 11,"not enoug depo");
     caseCount ++;
     uint time = block.timestamp;
@@ -234,33 +233,34 @@ contract PerformanceCheck {
       }
       else if ( measures[0]<200 && measures[0]!=0)
       {
-        if(((measures[1]>=180 && measures[1]<=250) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2]>=200 && measures[2]<=600) || measures[2]==10000 || measures[2]==0 ) && (measures[3] <= 1000 || measures[3] == 10000 || measures[3] == 0))
+        if(((measures[1]>=180) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2]>=200 && measures[2]<=600) || measures[2]==10000 || measures[2]==0 ) && (measures[3] <= 1000 || measures[3] == 10000 || measures[3] == 0))
         {
           AllfineCount ++;
           Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
         }
-        else if(measures[1]<180 )
+        else
         {
           FMFCount ++;
           FMF[FMFCount] = FMFs(FMFCount, devid, time, buid);
         }
-        else
-        {
-          COFCount ++;
-          COF[COFCount] = COFs(COFCount, devid, time, buid);
-        }
+       
       }
       else if ( measures[0]<=220 && measures[0]>=200)
       {
-        if(((measures[1]>=180 && measures[1]<=255) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2] >= 200 && measures[2]<= 600) || measures[2] == 10000 || measures[2] == 0 ) && (measures[3]<= 1000 || measures[3] == 10000 || measures[3] == 0))
+        if ((measures[1]<180))
+        {
+          COFCount ++;
+          COF[FMFCount] = COFs(COFCount, devid, time, buid);
+        }
+        else if(((measures[1]>=180) || measures[1] == 10000 || measures[1] == 0 ) && ((measures[2] >= 200 && measures[2]<= 600) || measures[2] == 10000 || measures[2] == 0 ) && (measures[3]<= 1000 || measures[3] == 10000 || measures[3] == 0))
         {
           AllfineCount ++;
           Allfine[AllfineCount] = Allfines(AllfineCount, devid, time, buid);
         }
         else
         {
-          COFCount ++;
-          COF[FMFCount] = COFs(COFCount, devid, time, buid);
+          FMFCount ++;
+          FMF[FMFCount] = FMFs(FMFCount, devid, time, buid);
         }
       }
       else{
@@ -345,40 +345,41 @@ contract PerformanceCheck {
       }
 
     }
-    require ((time-xtime)>=43200, "You should wait at least four minute after your previous transaction");
+    require ((time-xtime)>=432000, "You should wait at least four minute after your previous transaction");
     uint totdiff1 = 0;
     uint Esum = 0;
     uint EsumCount = 0;
     uint totdiff2 = 0;
+    uint totdiff3 = 0;
     uint maxamount = 0;
     //uint maxamount = (80*(duedate-xtime)/63072000)*1000000000000000000;
     uint sixmonthamount = (5)*1000000000000000000;
-    if ((time - stime) <= 6*43200){
+    if ((time - stime) <= 6*432000){
       state = 4;
-      if ((time-xtime) >= 43200 && (time-xtime) < 2*43200)
+      if ((time-xtime) >= 432000 && (time-xtime) < 2*432000)
       {
       maxamount = sixmonthamount * 1;
-      time = xtime + 43200;
+      time = xtime + 432000;
       }
-      else if ((time-xtime) >= 2*43200 && (time-xtime) < 3*43200 )
+      else if ((time-xtime) >= 2*432000 && (time-xtime) < 3*432000 )
       {
       maxamount = sixmonthamount * 2;
-      time = xtime + 2*43200;
+      time = xtime + 2*432000;
       }
-      else if ((time-xtime) >= 3*43200 && (time-xtime) < 4*43200 )
+      else if ((time-xtime) >= 3*432000 && (time-xtime) < 4*432000 )
       {
       maxamount = sixmonthamount * 3;
-      time = xtime + 3*43200;
+      time = xtime + 3*432000;
       }
-      else if ((time-xtime) >= 4*43200 && (time-xtime) < 5*43200 )
+      else if ((time-xtime) >= 4*432000 && (time-xtime) < 5*432000 )
       {
       maxamount = sixmonthamount * 4;
-      time = xtime + 4*43200;
+      time = xtime + 4*432000;
       }
-      else if ((time-xtime) >= 5*43200 && (time-xtime) < 6*43200)
+      else if ((time-xtime) >= 5*432000 && (time-xtime) < 6*432000)
       {
       maxamount = sixmonthamount * 5;
-      time = xtime + 5*43200;
+      time = xtime + 5*432000;
       }
       else {
       maxamount = 0;
@@ -390,19 +391,19 @@ contract PerformanceCheck {
       if (xtime == stime){
         maxamount = sixmonthamount * 6;
       }
-      else if ((xtime-stime) == 43200){
+      else if ((xtime-stime) == 432000){
         maxamount = sixmonthamount * 5;
       }
-      else if ((xtime-stime) == 2*43200){
+      else if ((xtime-stime) == 2*432000){
         maxamount = sixmonthamount * 4;
       }
-      else if ((xtime-stime) == 3*43200){
+      else if ((xtime-stime) == 3*432000){
         maxamount = sixmonthamount * 3;
       }
-      else if ((xtime-stime) == 4*43200){
+      else if ((xtime-stime) == 4*432000){
         maxamount = sixmonthamount * 2;
       }
-      else if ((xtime-stime) == 5*43200){
+      else if ((xtime-stime) == 5*432000){
         maxamount = sixmonthamount * 1;
       }
       else{
@@ -410,7 +411,7 @@ contract PerformanceCheck {
         state = 7;
       }
 
-      time = stime+6*43200;
+      time = stime+6*432000;
       //cases.remove(Cid);
       for (uint i = Cid; i<(caseCount); i++)
       {
@@ -448,14 +449,26 @@ contract PerformanceCheck {
         totdiff2 ++;
       }
     }
+    for (uint i = 1; i<(AllfineCount+1); i++)
+    {
+      // if ( FMF[uint(i)].caseid == caseNo && FMF[uint(i)].time > (xtime-1) && FMF[uint(i)].time < (time+1))
+      if ( keccak256(abi.encodePacked(( Allfine[uint(i)].buid))) == keccak256(abi.encodePacked((_buid))) &&
+      Allfine[uint(i)].time < time && Allfine[uint(i)].time >= xtime )
+      {
+        totdiff3 ++;
+      }
+    }
 
 
     if (EsumCount>0){
       if ((Esum*100/(EsumCount*Erate))>150){
-      if ((maxamount/sixmonthamount*250)>totdiff2 && (maxamount/sixmonthamount*150)<totdiff2 ){
+       if (((totdiff1+totdiff2+totdiff3)/3)<totdiff2 ){
+        totdiff1 += 0;
+      }
+      else if (((totdiff1+totdiff2+totdiff3)/3)>totdiff2 && ((totdiff1+totdiff2+totdiff3)/5)<totdiff2 ){
         totdiff1 += 200;
       }
-      else if ((maxamount/sixmonthamount*150)>=totdiff2 && (maxamount/sixmonthamount*50)<totdiff2 ){
+      else if (((totdiff1+totdiff2+totdiff3)/5)>=totdiff2 && ((totdiff1+totdiff2+totdiff3)/7)<totdiff2 ){
         totdiff1 += 350;
       }
       else {
@@ -463,17 +476,25 @@ contract PerformanceCheck {
       }
     }
 
-    else if ((Esum*100/(EsumCount*Erate))<=150 && (Esum*100/(EsumCount*Erate))>120){
-      if ((maxamount/sixmonthamount*250)>totdiff2 && (maxamount/sixmonthamount*150)<totdiff2 ){
+    else if ((Esum*100/(EsumCount*Erate))<=150 && (Esum*100/(EsumCount*Erate))>110){
+      if (((totdiff1+totdiff2+totdiff3)/3)<totdiff2 ){
+        totdiff1 += 0;
+      }
+      else if (((totdiff1+totdiff2+totdiff3)/3)>totdiff2 && ((totdiff1+totdiff2+totdiff3)/5)<totdiff2 ){
         totdiff1 += 100;
       }
-      if ((maxamount/sixmonthamount*150)>=totdiff2 && (maxamount/sixmonthamount*50)<totdiff2 ){
+      else if (((totdiff1+totdiff2+totdiff3)/5)>=totdiff2 && ((totdiff1+totdiff2+totdiff3)/7)<totdiff2 ){
         totdiff1 += 200;
       }
-      if ((maxamount/sixmonthamount*50)>=totdiff2){
+      else if ((maxamount/sixmonthamount*50)>=totdiff2){
         totdiff1 += 300;
+
       }
+        
+      
     }
+    else 
+    totdiff1 += 0;
     }
  
 

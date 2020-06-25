@@ -13,7 +13,7 @@ module.exports = {
       port: 8545,
       network_id: "4", // Rinkeby ID 4
       from: "0x5bD14b0aC08a7976af473a08E05A1e681C60cB23", // account from which to deploy
-      gas: 4500000,        // Rinkeby has a lower block limit than mainnet
+      gas: 10000000,        // Rinkeby has a lower block limit than mainnet
       gasPrice: 10000000000
     }
   },

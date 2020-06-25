@@ -37,8 +37,8 @@ App = {
 
     else {
         console.log("if 3");
-        App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
-        //App.web3Provider = new Web3.providers.HttpProvider(process.env.Infura_API_Key);
+        //App.web3Provider = new Web3.providers.HttpProvider('http://localhost:7545');
+        App.web3Provider = new Web3.providers.HttpProvider(process.env.Infura_API_Key);
     }
         console.log(App.web3Provider);
 

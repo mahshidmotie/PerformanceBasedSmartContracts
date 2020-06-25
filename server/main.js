@@ -12,10 +12,10 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 const Tx = require('ethereumjs-tx').Transaction;
 const Web3 = require('web3');
 var csvWriter = require('csv-write-stream');
-const networkURL = 'http://localhost:7545'; 
-const provider = new HDWalletProvider(process.env.ORACLE_ACCOUNTMNEMONIC, networkURL);
-//const networkURL = process.env.Infura_API_Key; 
-//const provider = new HDWalletProvider(process.env.ORACLE_RinkebyACCOUNTMNEMONIC, networkURL);
+//const networkURL = 'http://localhost:7545'; 
+//const provider = new HDWalletProvider(process.env.ORACLE_ACCOUNTMNEMONIC, networkURL);
+const networkURL = process.env.Infura_API_Key; 
+const provider = new HDWalletProvider(process.env.ORACLE_RinkebyACCOUNTMNEMONIC, networkURL);
 const web3 = new Web3(provider);
 
 // Readig the contract
@@ -50,11 +50,10 @@ app.get('/', (req, res) => {
 function randcreat() {
     var randomnumber=Math.random();
     console.log(' ' + randomnumber);
-    // const PerformanceCheckdep = await PerformanceCheck.deployed();
-    // const caseCount = (await PerformanceCheckdep.caseCount()).toString();
-    //console.log("case count"  + caseCount);
     decide(randomnumber);
 };
+
+
 
 function getMetaskAccountID () {
 
@@ -75,118 +74,28 @@ function getMetaskAccountID () {
 //decising whether a sensor of a building should be read
 async function decide (randomnumber){
     const PerformanceCheckdep = await PerformanceCheck.deployed();
+    // gettting number of monitored buildings from blockchain
     const caseCount = (await PerformanceCheckdep.caseCount()).toString();
     console.log("case count"  + caseCount);
-     //if (randomnumber<=caseCount*0.9){
-        if (randomnumber<=caseCount*0.20572917){
-        //console.log("select1:");
-        const select = Math.floor(randomnumber/0.9)+1;
+    // defining the number of measuremnets per day
+    const MPD = 150;
+    // calculating the decision factor 
+    const DF = MPD * 90 / (24 * 60 * 60);
+        if (randomnumber<=caseCount*DF){
+        // selectig the building based on the created random
+        const select = Math.floor(randomnumber/DF)+1;
         console.log(select);
+        // getting building information of the selected building from blockchain
         const item = await PerformanceCheckdep.cases(select);
+        // geeting te array contating sesnor ID s
         let bs = await PerformanceCheckdep.getarray(select);
         const buildingId = item[4];
         console.log("buildingId:",buildingId);
-        // *** if you need to read 3 rooms of a building
-        // for (i=0; i<3; i++)
-        // {
-        //     var randomnumber2=(Math.random())*bs.length;
-        //     const select2 = Math.floor(randomnumber2);
-    
-        //     var devid = bs[select2];
-        //     var devidstr = web3.utils.hexToUtf8(devid);
-    
-        //     var floor = (devidstr.split("'"))[1];
-        //     var room = (devidstr.split("'"))[2];
-        //     var building = (devidstr.split("'"))[0];
-        //     var Tid = building.concat("'",floor.concat("'",room.concat("'","SENDEV'TR")));
-        //     var RHuid = building.concat("'",floor.concat("'",room));
-        //     var AQuid = building.concat("'",floor.concat("'",room.concat("'","AQUALR")));
-        //     console.log("room:",room);
-        //     console.log("device id:",devidstr);
-        //     console.log("Tid:",Tid);
-        //     console.log("RHuid:",RHuid);
-        //     console.log("AQuid:",AQuid);
-        //     var token = await gettoken();
-        //     //console.log(token);
-        //     //var callres = await getObservationsByDatapointId(token, buiid, "B_01'EG'RS_EG_01_01'SENDEV'TR");
-        //     var callres = await getObservationsByDatapointId(token, buildingId, devidstr);
-        //     assert.equal(callres.status, 200);
-        //     body = callres.data;
-        //     assert.equal(body.data.length, 1);
-    
-        //     assert.equal(body.data[0].type, "observation");
-        //     const obsval = Math.floor((body.data[0].attributes.value)*10);
-        //     console.log("T set point value:",body.data[0].attributes.value);
-    
-        //     let check = await PerformanceCheckdep.chekTid(select, web3.utils.asciiToHex(Tid) );
-        //     console.log("check:",check);
-        //     if (check){
-        //         var callres2 = await getObservationsByDatapointId(token, buildingId, Tid);
-        
-        //         assert.equal(callres2.status, 200);
-        //         body = callres2.data;
-        //         assert.equal(body.data.length, 1);
-        
-        //         assert.equal(body.data[0].type, "observation");
-        //         var obsval2 = Math.floor((body.data[0].attributes.value)*10);
-    
-        //     }
-        //     else{
-        //         var obsval2 = 10000;
-        //     }
-        
-        //     console.log("Room T value:",obsval2);
-    
-        //     let check2 = await PerformanceCheckdep.chekRHuid(select, web3.utils.asciiToHex(RHuid) );
-        //     console.log("check2:",check2);
-        //     if (check2){
-        //         RHuid = RHuid.concat("'","SENDEV'HURELR");
-        //         console.log("RHuid:",RHuid);
-        //         var callres3 = await getObservationsByDatapointId(token, buildingId, RHuid);
-        
-        //         assert.equal(callres3.status, 200);
-        //         body = callres3.data;
-        //         assert.equal(body.data.length, 1);
-         
-        //         assert.equal(body.data[0].type, "observation");
-        //         var obsval3 = Math.floor((body.data[0].attributes.value)*10);
-        //     }
-        //     else{
-        //         obsval3 = 10000;
-        //     }
-        
-        //     console.log("Relative Humidity value:",obsval3);
-    
-        //     let check3 = await PerformanceCheckdep.chekAQuid(select, web3.utils.asciiToHex(AQuid) );
-        //     console.log("check3:",check3);
-        //     if (check3){
-        //         var callres4 = await getObservationsByDatapointId(token, buildingId, AQuid);
-       
-        //         assert.equal(callres4.status, 200);
-        //         body = callres4.data;
-        //         assert.equal(body.data.length, 1);
-        
-        //         assert.equal(body.data[0].type, "observation");
-        //         var obsval4 = Math.floor((body.data[0].attributes.value));
-        //     }
-        //     else{
-        //         obsval4 = 10000;
-        //     }
-        //     console.log("Air quality value:",obsval4);
-
-        //     devids[i]= devid;
-        //     measus[i*4]= obsval;
-        //     measus[i*4+1]=obsval2;
-        //     measus[i*4+2]=obsval3;
-        //     measus[i*4+3]=obsval4;
-           
-    
-        // } ***************************
-        // if you check the sensors of only one room
+        // creating the second random number for selecting the sensor
         var randomnumber2=(Math.random())*bs.length;
         const select2 = Math.floor(randomnumber2);
-    
         var devid = bs[select2];
+        // conversting the formt of the sensor id to string
         var devidstr = web3.utils.hexToUtf8(devid);
 
         // later we should get list of rooms and then check the sesnors is a room, not finding one snesor and creating other addresess
@@ -211,13 +120,10 @@ async function decide (randomnumber){
 
         // assert.equal(body.data[0].type, "observation");
         var obsval = 0;
-        var randomT=Math.random();
-        if (randomT < 0.3)
+        
+        if (room == "RS_1OG_02_01" ||room == "RS_1OG_02_02" || room == "RS_1OG_05_03" )
         {
-            obsval = 221;
-        }
-        else if(randomT > 0.9){
-            obsval = 199;
+            obsval = 225;
         }
         else{
             obsval = 210;
@@ -517,13 +423,30 @@ async function decide (randomnumber){
 
 }
 
+// async function readmeasurmenet(){
+//     const PerformanceCheckdep = await PerformanceCheck.deployed();
+//     const num = (await PerformanceCheckdep.measurmentCount()).toString();
+//     console.log("case count"  + num);
+//     //const num = await PerformanceCheckdep.measurmentCount();
+//     for (var a=1; a<num+1; a++){
+//         var valuesSt = await PerformanceCheckdep.values(a);
+//         //let bs = await PerformanceCheckdep.getarray2(a);
+//         var deviceid1 = valuesSt[1];
+//         var deviceid = web3.utils.hexToUtf8(deviceid1);
+//         var values = (valuesSt[3]).toString();
+//         console.log(deviceid);
+//         console.log(values);
+//         //console.log(values);
+//     }
+// }
 
 app.get('/random', jsonParser, (req, res)=>{
 
     
     setInterval(() => {
-        randcreat();
-    }, 180000);
+       randcreat();
+     }, 18000);
+    //readmeasurmenet();
     
     
 });
@@ -694,7 +617,7 @@ function getRequest(token, method, path, data) {
   const REQUEST_TIMEOUT = 20000;
   async function getByFilter(token, buildingId, resource, filterKey, filterValue) {
     let date_ob1 = new Date();
-    let date_ob = new Date(date_ob1 - 2937600000);
+    let date_ob = new Date(date_ob1 - 4147200000);
     let date_ob2 = new Date(date_ob - 900000);
 
     // current date
