@@ -1,6 +1,6 @@
 # Performance Based Smart Contracts
 
-This code was developed in a master thesis at [ETH Zurich, chair of innovative and industrial construction](hhttps://ic.ibi.ethz.ch/) during 2019-2020 by Mahshid Motie, under the supervision of Jens Hunhevicz and Prof. Dr. Daniel Hall.
+This code was developed in a master thesis at [ETH Zurich, chair of innovative and industrial construction](https://ic.ibi.ethz.ch/) during 2019-2020 by Mahshid Motie, under the supervision of Jens Hunhevicz and Prof. Dr. Daniel Hall.
 
 License: [MIT](./LICENSE)
 
